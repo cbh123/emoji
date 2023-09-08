@@ -74,13 +74,13 @@ defmodule EmojiWeb.HomeLive do
   def handle_info({:image_generated, prediction, {:ok, %{output: nil} = r8_prediction}}, socket) do
     {:ok, _prediction} =
       Predictions.update_prediction(prediction, %{
-        emoji_output: nil,
+        emoji_output: "failed",
         uuid: r8_prediction.id
       })
 
     {:noreply,
      socket
-     |> put_flash(:info, "Uh oh, image generation failed. Likely NSFW input. Try again!")}
+     |> put_flash(:error, "Uh oh, image generation failed. Likely NSFW input. Try again!")}
   end
 
   def handle_info({:image_generated, prediction, {:ok, r8_prediction}}, socket) do
