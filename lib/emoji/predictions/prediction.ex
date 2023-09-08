@@ -10,6 +10,7 @@ defmodule Emoji.Predictions.Prediction do
     field :score, :integer, default: 0
     field :count_votes, :integer, default: 0
     field :is_featured, Ecto.Enum, values: [true, false]
+    field :local_user_id, :string
 
     timestamps()
   end
@@ -24,7 +25,8 @@ defmodule Emoji.Predictions.Prediction do
       :emoji_output,
       :score,
       :count_votes,
-      :is_featured
+      :is_featured,
+      :local_user_id
     ])
     |> validate_required([:prompt])
   end

@@ -25,6 +25,21 @@ import FileSaver from "../vendor/file-saver";
 
 let Hooks = {};
 
+function genId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+Hooks.AssignUserId = {
+    mounted() {
+      let userId = localStorage.getItem('userId');
+      if (!userId) {
+        userId = genId(); // replace this with your user id generation logic
+        localStorage.setItem('userId', userId);
+      }
+      this.pushEvent('assign-user-id', {userId: userId});
+    }
+  };
+
 Hooks.DownloadImage = {
     mounted() {
       this.el.addEventListener("click", (e) => {

@@ -8,8 +8,8 @@ defmodule EmojiWeb.HomeLive do
     {:ok,
      socket
      |> assign(form: to_form(%{"prompt" => ""}))
+     |> assign(local_user_id: nil)
      |> assign(show_bg: false)
-     |> stream(:my_predictions, [])
      |> stream(:featured_predictions, Predictions.list_featured_predictions())}
   end
 
@@ -45,13 +45,24 @@ defmodule EmojiWeb.HomeLive do
     {:noreply, socket}
   end
 
+  def handle_event("assign-user-id", %{"userId" => user_id}, socket) do
+    # handle the user id
+    predictions = Predictions.list_user_predictions(user_id)
+
+    {:noreply, socket |> assign(local_user_id: user_id) |> stream(:my_predictions, predictions)}
+  end
+
   def handle_event("save", %{"prompt" => prompt}, socket) do
     styled_prompt =
       (@preprompt <> String.trim_trailing(String.downcase(prompt)))
       |> String.replace("emoji of a a ", "emoji of a ")
       |> String.replace("emoji of a an ", "emoji of an ")
 
-    {:ok, prediction} = Predictions.create_prediction(%{prompt: styled_prompt})
+    {:ok, prediction} =
+      Predictions.create_prediction(%{
+        prompt: styled_prompt,
+        local_user_id: socket.assigns.local_user_id
+      })
 
     start_task(fn -> {:image_generated, prediction, gen_image(styled_prompt)} end)
 

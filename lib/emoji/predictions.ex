@@ -30,6 +30,10 @@ defmodule Emoji.Predictions do
     )
   end
 
+  def list_user_predictions(user_id) do
+    Repo.all(from p in Prediction, where: p.local_user_id == ^user_id)
+  end
+
   def list_finished_predictions() do
     Repo.all(
       from p in Prediction,
