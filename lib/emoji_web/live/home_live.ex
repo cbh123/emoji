@@ -16,7 +16,10 @@ defmodule EmojiWeb.HomeLive do
   end
 
   def handle_event("save", %{"prompt" => prompt}, socket) do
-    styled_prompt = @preprompt <> prompt
+    styled_prompt =
+      (@preprompt <> String.trim_trailing(prompt))
+      |> String.replace("emoji of a a ", "emoji of a ")
+      |> String.replace("emoji of a an ", "emoji of an ")
     {:ok, prediction} = Predictions.create_prediction(%{prompt: styled_prompt})
 
     start_task(fn -> {:image_generated, prediction.id, gen_image(styled_prompt)} end)
@@ -53,8 +56,10 @@ defmodule EmojiWeb.HomeLive do
   defp dasherize(name) do
     name
     |> String.replace(@preprompt, "")
+    |> String.replace("A TOK emoji of an ", "")
     |> String.split(" ")
     |> Enum.join("-")
+    |> String.replace("--", "-")
   end
 
   defp remove_bg(url) do
@@ -64,7 +69,7 @@ defmodule EmojiWeb.HomeLive do
 
   defp gen_image(prompt) do
     "fofr/sdxl-emoji:4d2c2e5e40a5cad182e5729b49a08247c22a5954ae20356592caaada42dc8985"
-    |> Replicate.run(prompt: prompt)
+    |> Replicate.run(prompt: prompt, width: 768, height: 768, num_inference_steps: 30)
     |> List.first()
   end
 
