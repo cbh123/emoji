@@ -8,7 +8,8 @@ defmodule EmojiWeb.HomeLive do
     {:ok,
      socket
      |> assign(form: to_form(%{"prompt" => ""}))
-     |> stream(:predictions, Predictions.list_finished_predictions() |> Enum.reverse())
+     |> stream(:my_predictions, [])
+     |> stream(:predictions, Predictions.list_finished_predictions())
      |> stream(:recent_predictions, Predictions.list_firehose_predictions())}
   end
 
@@ -52,7 +53,7 @@ defmodule EmojiWeb.HomeLive do
 
     {:noreply,
      socket
-     |> stream_insert(:predictions, prediction, at: 0)}
+     |> stream_insert(:my_predictions, prediction, at: 0)}
   end
 
   def handle_info({:image_generated, id, image}, socket) do
@@ -62,7 +63,7 @@ defmodule EmojiWeb.HomeLive do
 
     {:noreply,
      socket
-     |> stream_insert(:predictions, prediction)
+     |> stream_insert(:my_predictions, prediction)
      |> put_flash(:info, "Image generated. Starting background removal")}
   end
 
@@ -71,7 +72,7 @@ defmodule EmojiWeb.HomeLive do
 
     {:noreply,
      socket
-     |> stream_insert(:predictions, prediction)
+     |> stream_insert(:my_predictions, prediction)
      |> put_flash(:info, "Background successfully removed!")}
   end
 
