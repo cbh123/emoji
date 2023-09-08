@@ -1,5 +1,5 @@
 <.simple_form for={@form} id="prediction-form" phx-change="validate" phx-submit="save">
-  <.input field={@form[:prompt]} type="text" label="Prompt" />
+  <.input field={@form[:prompt]} type="text" required label="Prompt" />
   <span class="text-xs text-gray-500">
     Try something simple like ‘cat’ or ‘high five’
   </span>
