@@ -74,7 +74,8 @@ defmodule EmojiWeb.HomeLive do
   def handle_info({:image_generated, prediction, {:ok, %{output: nil} = r8_prediction}}, socket) do
     {:ok, _prediction} =
       Predictions.update_prediction(prediction, %{
-        emoji_output: "failed",
+        emoji_output:
+          "https://github.com/replicate/zoo/assets/14149230/39c124db-a793-4ca9-a9b4-706fe18984ad",
         uuid: r8_prediction.id
       })
 
