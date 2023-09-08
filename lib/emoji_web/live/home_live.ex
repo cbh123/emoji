@@ -10,8 +10,7 @@ defmodule EmojiWeb.HomeLive do
      |> assign(form: to_form(%{"prompt" => ""}))
      |> assign(show_bg: false)
      |> stream(:my_predictions, [])
-     |> stream(:predictions, Predictions.list_finished_predictions())
-     |> stream(:recent_predictions, Predictions.list_firehose_predictions())}
+     |> stream(:featured_predictions, Predictions.list_featured_predictions())}
   end
 
   def handle_event("thumbs-up", %{"id" => id}, socket) do

@@ -72,14 +72,14 @@
   </li>
 </ul>
 
-<.header class="mt-12">Examples</.header>
+<.header class="mt-12">Featured</.header>
 <ul
   id="example-predictions"
   phx-update="stream"
   role="list"
   class="grid grid-cols-2 mt-6 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
 >
-  <li :for={{id, prediction} <- @streams.predictions} id={id} class="relative">
+  <li :for={{id, prediction} <- @streams.featured_predictions} id={id} class="relative">
     <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-black-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
       <%= if is_nil(prediction.emoji_output) and is_nil(prediction.no_bg_output) do %>
         <div class="flex items-center justify-center h-36">

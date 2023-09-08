@@ -39,6 +39,17 @@ defmodule Emoji.Predictions do
     )
   end
 
+  def list_featured_predictions() do
+    Repo.all(
+      from p in Prediction,
+        where:
+          p.is_featured == true or
+            (not is_nil(p.no_bg_output) and p.score > 3 and p.count_votes > 5),
+        order_by: fragment("RANDOM()"),
+        limit: 16
+    )
+  end
+
   @doc """
   Gets a single prediction.
 

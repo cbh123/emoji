@@ -9,6 +9,7 @@ defmodule Emoji.Predictions.Prediction do
     field :uuid, :string
     field :score, :integer, default: 0
     field :count_votes, :integer, default: 0
+    field :is_featured, Ecto.Enum, values: [true, false]
 
     timestamps()
   end
@@ -16,7 +17,15 @@ defmodule Emoji.Predictions.Prediction do
   @doc false
   def changeset(prediction, attrs) do
     prediction
-    |> cast(attrs, [:uuid, :prompt, :no_bg_output, :emoji_output, :score, :count_votes])
+    |> cast(attrs, [
+      :uuid,
+      :prompt,
+      :no_bg_output,
+      :emoji_output,
+      :score,
+      :count_votes,
+      :is_featured
+    ])
     |> validate_required([:prompt])
   end
 end
