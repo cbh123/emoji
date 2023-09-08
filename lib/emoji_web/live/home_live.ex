@@ -14,12 +14,25 @@ defmodule EmojiWeb.HomeLive do
   def handle_event("thumbs-up", %{"id" => id}, socket) do
     prediction = Predictions.get_prediction!(id)
 
-    Predictions.update_prediction(prediction, %{
-      score: prediction.score + 1,
-      count_votes: prediction.count_votes + 1
-    })
+    {:ok, _prediction} =
+      Predictions.update_prediction(prediction, %{
+        score: prediction.score + 1,
+        count_votes: prediction.count_votes + 1
+      })
 
-    {:noreply, socket}
+    {:noreply, socket |> put_flash(:info, "Thanks for your rating!")}
+  end
+
+  def handle_event("thumbs-down", %{"id" => id}, socket) do
+    prediction = Predictions.get_prediction!(id)
+
+    {:ok, _prediction} =
+      Predictions.update_prediction(prediction, %{
+        score: prediction.score - 1,
+        count_votes: prediction.count_votes + 1
+      })
+
+    {:noreply, socket |> put_flash(:info, "Thanks for your rating!")}
   end
 
   def handle_event("validate", %{"prompt" => _prompt}, socket) do

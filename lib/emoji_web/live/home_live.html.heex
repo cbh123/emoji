@@ -39,11 +39,11 @@
     <p class="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
       :<%= human_name(prediction.prompt) %>:
     </p>
-    <div class="hidden flex justify-between">
+    <div class={"flex justify-between items-center feedback-#{prediction.id}"}>
       <button
-        id={"thumbs-up-#{id}"}
-        phx-click="thumbs-up"
-        phx-value-id={id}
+        id={"thumbs-up-#{prediction.id}"}
+        phx-click={JS.hide(to: ".feedback-#{prediction.id}") |> JS.push("thumbs-up")}
+        phx-value-id={prediction.id}
         class="rounded-full bg-gray-50 border p-1 mt-2"
       >
         <img
@@ -52,9 +52,13 @@
           alt=""
         />
       </button>
-      <button phx-click="thumbs-down" class="rounded-full bg-gray-50 border p-1 mt-2 rotate-180">
+      <button
+        id={"thumbs-down-#{prediction.id}"}
+        phx-value-id={prediction.id}
+        phx-click={JS.hide(to: ".feedback-#{prediction.id}") |> JS.push("thumbs-down")}
+        class="rounded-full bg-gray-50 border p-1 mt-2 rotate-180"
+      >
         <img
-          id={"thumbs-down-#{id}"}
           class="h-6"
           src="https://github.com/replicate/zoo/assets/14149230/866884cd-071e-435f-8e35-8e8754c97da0"
           alt=""
