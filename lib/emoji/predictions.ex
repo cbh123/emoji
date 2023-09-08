@@ -22,7 +22,7 @@ defmodule Emoji.Predictions do
   end
 
   def list_finished_predictions() do
-    Repo.all(from p in Prediction, where: not is_nil(p.output))
+    Repo.all(from p in Prediction, where: not is_nil(p.output), limit: 50)
   end
 
   @doc """
