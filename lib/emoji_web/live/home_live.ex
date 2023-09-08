@@ -61,11 +61,11 @@ defmodule EmojiWeb.HomeLive do
   end
 
   def handle_info({:image_generated, prediction, {:ok, r8_prediction}}, socket) do
-    r2_url = save_r2("prediction-#{prediction.id}-emoji", r8_prediction.output |> List.first())
+    # r2_url = save_r2("prediction-#{prediction.id}-emoji", r8_prediction.output |> List.first())
 
     {:ok, prediction} =
       Predictions.update_prediction(prediction, %{
-        emoji_output: r2_url,
+        emoji_output: r8_prediction.output |> List.first(),
         uuid: r8_prediction.id
       })
 
@@ -78,8 +78,9 @@ defmodule EmojiWeb.HomeLive do
   end
 
   def handle_info({:background_removed, prediction, image}, socket) do
-    r2_url = save_r2("prediction-#{prediction.id}-nobg", image)
-    {:ok, prediction} = Predictions.update_prediction(prediction, %{no_bg_output: r2_url})
+    # r2_url = save_r2("prediction-#{prediction.id}-nobg", image)
+
+    {:ok, prediction} = Predictions.update_prediction(prediction, %{no_bg_output: image})
 
     {:noreply,
      socket
