@@ -31,10 +31,13 @@
           </button>
         <% end %>
       </div>
-      <p class="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
+
+      <.link
+        navigate={~p"/emoji/#{prediction.id}"}
+        class="mt-2 block truncate text-sm font-medium text-gray-900"
+      >
         :<%= human_name(prediction.prompt) %>:
-      </p>
-      <div class={"flex justify-between items-center feedback-#{prediction.id}"}></div>
+      </.link>
     </li>
   </ul>
 </div>

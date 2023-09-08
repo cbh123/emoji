@@ -1,10 +1,15 @@
 defmodule EmojiWeb.ShowLive do
   use EmojiWeb, :live_view
   alias Emoji.Predictions
+  alias Emoji.Predictions.Prediction
 
   def mount(%{"id" => id}, _session, socket) do
     prediction = Predictions.get_prediction!(id)
-    {:ok, socket |> assign(prediction: prediction)}
+    {:ok, socket |> assign(prediction: prediction) |> assign(show_bg: true)}
+  end
+
+  def handle_event("toggle-bg", _, socket) do
+    {:noreply, socket |> assign(show_bg: !socket.assigns.show_bg)}
   end
 
   def handle_event("thumbs-up", %{"id" => id}, socket) do
@@ -30,6 +35,20 @@ defmodule EmojiWeb.ShowLive do
 
     {:noreply, socket |> put_flash(:info, "Thanks for your rating!")}
   end
+
+  def render_image(%Prediction{no_bg_output: nil, emoji_output: nil}, _show_bg), do: nil
+
+  def render_image(%Prediction{no_bg_output: nil, emoji_output: emoji_output}, _show_bg),
+    do: emoji_output
+
+  def render_image(%Prediction{no_bg_output: no_bg_output, emoji_output: nil}, _show_bg),
+    do: no_bg_output
+
+  def render_image(%Prediction{no_bg_output: _no_bg_output, emoji_output: emoji_output}, true),
+    do: emoji_output
+
+  def render_image(%Prediction{no_bg_output: no_bg_output, emoji_output: _emoji_output}, false),
+    do: no_bg_output
 
   defp human_name(name) do
     dasherize(name)

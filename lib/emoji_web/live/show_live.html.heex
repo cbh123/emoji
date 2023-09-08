@@ -1,12 +1,15 @@
+<.button phx-click="toggle-bg"><%= if @show_bg, do: "Hide", else: "Show" %> background</.button>
+
 <button
   id={"prediction-#{@prediction.id}-btn"}
   phx-hook="DownloadImage"
+  class="mt-4"
   phx-value-name={@prediction.prompt |> human_name()}
-  phx-value-image={@prediction.no_bg_output || @prediction.emoji_output}
+  phx-value-image={render_image(@prediction, @show_bg)}
   type="button"
 >
   <img
-    src={@prediction.no_bg_output || @prediction.emoji_output}
+    src={render_image(@prediction, @show_bg)}
     alt={@prediction.prompt}
     class="pointer-events-none object-cover group-hover:opacity-75"
   />
