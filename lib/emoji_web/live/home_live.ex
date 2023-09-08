@@ -16,9 +16,10 @@ defmodule EmojiWeb.HomeLive do
   end
 
   def handle_event("save", %{"prompt" => prompt}, socket) do
-    styled_prompt = @preprompt <> String.trim_trailing(prompt)
-    styled_prompt = String.replace(styled_prompt, "emoji of a a ", "emoji of a ")
-    styled_prompt = String.replace(styled_prompt, "emoji of a an ", "emoji of an ")
+    styled_prompt =
+      (@preprompt <> String.trim_trailing(prompt))
+      |> String.replace("emoji of a a ", "emoji of a ")
+      |> String.replace("emoji of a an ", "emoji of an ")
     {:ok, prediction} = Predictions.create_prediction(%{prompt: styled_prompt})
 
     start_task(fn -> {:image_generated, prediction.id, gen_image(styled_prompt)} end)
