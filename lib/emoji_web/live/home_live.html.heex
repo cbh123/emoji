@@ -1,7 +1,7 @@
 <.simple_form for={@form} id="prediction-form" phx-change="validate" phx-submit="save">
   <.input field={@form[:prompt]} type="text" required label="Prompt" />
   <span class="text-xs text-gray-500">
-    Try something simple like ‘cat’ or ‘high five’
+    Try something simple like ‘cat’ or ‘high five’. Click to download, and then add as a Slack emoji!
   </span>
   <:actions>
     <.button phx-disable-with="Saving...">Generate</.button>
@@ -16,7 +16,7 @@
 >
   <li :for={{id, prediction} <- @streams.my_predictions} id={id} class="relative">
     <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-black-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
-      <%= if is_nil(prediction.emoji_output) do %>
+      <%= if is_nil(prediction.emoji_output) and is_nil(prediction.no_bg_output) do %>
         <div class="flex items-center justify-center h-36">
           <p class="animate-pulse ">Loading...</p>
         </div>
