@@ -20,6 +20,16 @@
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
+    <!-- Google analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YSQ4KK6Z2H">
+    </script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-YSQ4KK6Z2H');
+    </script>
   </head>
   <body class="bg-white antialiased">
     <%= @inner_content %>
