@@ -33,8 +33,7 @@ defmodule Emoji.Predictions do
   def list_finished_predictions() do
     Repo.all(
       from p in Prediction,
-        where: not is_nil(p.output),
-        order_by: [asc: p.inserted_at],
+        where: not is_nil(p.output) and p.score > 3 and p.count_votes > 5,
         limit: 8
     )
   end
