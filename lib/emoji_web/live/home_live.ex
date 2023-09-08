@@ -123,7 +123,7 @@ defmodule EmojiWeb.HomeLive do
     version =
       Replicate.Models.get_version!(
         model,
-        "fadf75f542463e8fd1e3d83a0775ad0f3a0fd2ca3f6bb5ad52a7639cdf8ba93f"
+        "4d2c2e5e40a5cad182e5729b49a08247c22a5954ae20356592caaada42dc8985"
       )
 
     {:ok, prediction} =
