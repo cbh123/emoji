@@ -1,7 +1,7 @@
 <.simple_form for={@form} id="prediction-form" phx-change="validate" phx-submit="save">
   <.input field={@form[:prompt]} type="text" label="Prompt" />
   <span class="text-xs text-gray-500">
-    Pro-tip: we'll automatiically pre-pend 'A TOK emoji of a' to your prompt. Try something simple like 'cat' or 'high five'.
+    Try something simple like ‘cat’ or ‘high five’
   </span>
   <:actions>
     <.button phx-disable-with="Saving...">Generate</.button>
@@ -40,9 +40,6 @@
     </div>
     <p class="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
       :<%= human_name(prediction.prompt) %>:
-    </p>
-    <p class="pointer-events-none block text-sm font-medium text-gray-500">
-      <%= prediction.prompt %>
     </p>
   </li>
   <!-- More files... -->
