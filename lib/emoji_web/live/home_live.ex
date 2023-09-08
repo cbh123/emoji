@@ -10,6 +10,7 @@ defmodule EmojiWeb.HomeLive do
      |> assign(form: to_form(%{"prompt" => ""}))
      |> assign(local_user_id: nil)
      |> assign(show_bg: false)
+     |> stream(:my_predictions, [])
      |> stream(:featured_predictions, Predictions.list_featured_predictions())}
   end
 
@@ -47,9 +48,8 @@ defmodule EmojiWeb.HomeLive do
 
   def handle_event("assign-user-id", %{"userId" => user_id}, socket) do
     # handle the user id
-    predictions = Predictions.list_user_predictions(user_id)
 
-    {:noreply, socket |> assign(local_user_id: user_id) |> stream(:my_predictions, predictions)}
+    {:noreply, socket |> assign(local_user_id: user_id)}
   end
 
   def handle_event("save", %{"prompt" => prompt}, socket) do
