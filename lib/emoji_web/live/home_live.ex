@@ -68,7 +68,7 @@ defmodule EmojiWeb.HomeLive do
 
   defp gen_image(prompt) do
     "fofr/sdxl-emoji:4d2c2e5e40a5cad182e5729b49a08247c22a5954ae20356592caaada42dc8985"
-    |> Replicate.run(prompt: prompt)
+    |> Replicate.run(prompt: prompt, width: 768, height: 768, num_inference_steps: 30)
     |> List.first()
   end
 
