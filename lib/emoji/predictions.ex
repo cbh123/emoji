@@ -31,7 +31,12 @@ defmodule Emoji.Predictions do
   end
 
   def list_user_predictions(user_id) do
-    Repo.all(from p in Prediction, where: p.local_user_id == ^user_id)
+    Repo.all(
+      from p in Prediction,
+        where: p.local_user_id == ^user_id,
+        order_by: [desc: p.inserted_at],
+        where: not is_nil(p.no_bg_output)
+    )
   end
 
   def list_finished_predictions() do

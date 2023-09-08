@@ -1,16 +1,35 @@
 <div id="home" phx-hook="AssignUserId">
-  <.simple_form for={@form} id="prediction-form" phx-change="validate" phx-submit="save">
-    <.input field={@form[:prompt]} type="text" required label="Prompt" />
+  <div class="mb-20 mt-12 w-full text-center">
+    <div class="font-bold mb-3">
+      <a
+        href="https://replicate.com/fofr/sdxl-emoji?utm_source=project&utm_campaign=almoji"
+        class="font-bold hover:underline"
+      >
+        Powered by fofr/sdxl-emoji on Replicate. Build your own AI app →
+      </a>
+    </div>
+    <div>
+      <a href="https://github.com/cbh123/emoji">Fork this app on GitHub</a>
+    </div>
+  </div>
+
+  <.form for={@form} id="prediction-form" phx-change="validate" phx-submit="save">
+    <div class="flex items-center w-full bg-gray-50">
+      <.input
+        field={@form[:prompt]}
+        type="text"
+        required
+        placeholder="What is your emoji?"
+        class=""
+      />
+      <.button phx-disable-with="Saving..." class="self-end ml-2">Generate</.button>
+    </div>
     <span class="text-xs text-gray-500">
       Try something simple like ‘cat’ or ‘high five’. Click to download, and then add as a Slack emoji!
     </span>
-    <:actions>
-      <.button phx-disable-with="Saving...">Generate</.button>
-    </:actions>
-  </.simple_form>
+  </.form>
 
   <div :if={not is_nil(@local_user_id)}>
-    <.header class="mt-12">My Emojis</.header>
     <ul
       id="my-predictions"
       phx-update="stream"
@@ -39,9 +58,12 @@
             </button>
           <% end %>
         </div>
-        <p class="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
+        <.link
+          navigate={~p"/emoji/#{prediction.id}"}
+          class="mt-2 block truncate text-sm font-medium text-gray-900"
+        >
           :<%= human_name(prediction.prompt) %>:
-        </p>
+        </.link>
         <div class={"flex justify-between items-center feedback-#{prediction.id}"}>
           <button
             id={"thumbs-up-#{prediction.id}"}
@@ -101,9 +123,12 @@
           </button>
         <% end %>
       </div>
-      <p class="pointer-events-none mt-2 block truncate text-sm font-medium text-gray-900">
+      <.link
+        navigate={~p"/emoji/#{prediction.id}"}
+        class="mt-2 block truncate text-sm font-medium text-gray-900"
+      >
         :<%= human_name(prediction.prompt) %>:
-      </p>
+      </.link>
       <div class={"flex justify-between items-center feedback-#{prediction.id}"}>
         <button
           id={"thumbs-up-#{prediction.id}"}
