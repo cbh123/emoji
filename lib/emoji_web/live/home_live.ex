@@ -9,7 +9,7 @@ defmodule EmojiWeb.HomeLive do
      socket
      |> assign(form: to_form(%{"prompt" => ""}))
      |> assign(local_user_id: nil)
-     |> assign(show_bg: false)
+     |> assign(remove_bg: true)
      |> stream(:my_predictions, [])
      |> stream(:featured_predictions, Predictions.list_featured_predictions())}
   end
@@ -47,8 +47,6 @@ defmodule EmojiWeb.HomeLive do
   end
 
   def handle_event("assign-user-id", %{"userId" => user_id}, socket) do
-    # handle the user id
-
     {:noreply, socket |> assign(local_user_id: user_id)}
   end
 
@@ -103,6 +101,7 @@ defmodule EmojiWeb.HomeLive do
 
   def handle_info({:background_removed, prediction, image}, socket) do
     # r2_url = save_r2("prediction-#{prediction.id}-nobg", image)
+    send_telegram_message(prediction.prompt, image)
 
     {:ok, prediction} = Predictions.update_prediction(prediction, %{no_bg_output: image})
 
@@ -171,5 +170,16 @@ defmodule EmojiWeb.HomeLive do
       |> ExAws.request!()
 
     "#{System.get_env("CLOUDFLARE_PUBLIC_URL")}/#{file_name}"
+  end
+
+  def send_telegram_message(prompt, image) do
+    token = System.fetch_env!("TELEGRAM_BOT_TOKEN")
+    chat_id = System.fetch_env!("TELEGRAM_CHAT_ID")
+
+    url = "https://api.telegram.org/bot#{token}/sendMessage"
+    headers = ["Content-Type": "application/json"]
+    body = Jason.encode!(%{chat_id: chat_id, text: "prompt: #{prompt}, image: #{image}"})
+
+    HTTPoison.post(url, body, headers)
   end
 end

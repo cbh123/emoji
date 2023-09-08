@@ -18,7 +18,7 @@ defmodule EmojiWeb.Router do
     pipe_through :browser
 
     live "/", HomeLive, :index
-    live "/emojis", IndexLive, :index
+    live "/my-emojis", HistoryLive, :index
   end
 
   # Other scopes may use custom stacks.
