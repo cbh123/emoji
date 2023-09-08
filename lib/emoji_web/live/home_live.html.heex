@@ -8,6 +8,10 @@
   </:actions>
 </.simple_form>
 
+<.button class="hidden" phx-click="toggle-bg">
+  <%= if @show_bg, do: "Hide", else: "Show" %> BG
+</.button>
+
 <ul
   id="my-predictions"
   phx-update="stream"

@@ -8,6 +8,7 @@ defmodule EmojiWeb.HomeLive do
     {:ok,
      socket
      |> assign(form: to_form(%{"prompt" => ""}))
+     |> assign(show_bg: false)
      |> stream(:my_predictions, [])
      |> stream(:predictions, Predictions.list_finished_predictions())
      |> stream(:recent_predictions, Predictions.list_firehose_predictions())}
@@ -35,6 +36,10 @@ defmodule EmojiWeb.HomeLive do
       })
 
     {:noreply, socket |> put_flash(:info, "Thanks for your rating!")}
+  end
+
+  def handle_event("toggle-bg", _, socket) do
+    {:noreply, socket |> assign(show_bg: !socket.assigns.show_bg)}
   end
 
   def handle_event("validate", %{"prompt" => _prompt}, socket) do
