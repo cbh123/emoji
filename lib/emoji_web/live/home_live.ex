@@ -20,6 +20,7 @@ defmodule EmojiWeb.HomeLive do
       (@preprompt <> String.trim_trailing(prompt))
       |> String.replace("emoji of a a ", "emoji of a ")
       |> String.replace("emoji of a an ", "emoji of an ")
+
     {:ok, prediction} = Predictions.create_prediction(%{prompt: styled_prompt})
 
     start_task(fn -> {:image_generated, prediction.id, gen_image(styled_prompt)} end)
@@ -50,7 +51,7 @@ defmodule EmojiWeb.HomeLive do
   end
 
   defp human_name(name) do
-    "ai-" <> dasherize(name)
+    dasherize(name)
   end
 
   defp dasherize(name) do

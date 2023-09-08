@@ -21,20 +21,18 @@
           <p class="animate-pulse ">Loading...</p>
         </div>
       <% else %>
-        <img
-          src={prediction.output}
-          alt={prediction.prompt}
-          class="pointer-events-none object-cover group-hover:opacity-75"
-        />
         <button
           id={"prediction-#{id}-btn"}
           phx-hook="DownloadImage"
           phx-value-name={prediction.prompt |> human_name()}
           phx-value-image={prediction.output}
           type="button"
-          class="absolute inset-0 focus:outline-none"
         >
-          <span class="sr-only"></span>
+          <img
+            src={prediction.output}
+            alt={prediction.prompt}
+            class="pointer-events-none object-cover group-hover:opacity-75"
+          />
         </button>
       <% end %>
     </div>
@@ -42,5 +40,4 @@
       :<%= human_name(prediction.prompt) %>:
     </p>
   </li>
-  <!-- More files... -->
 </ul>
