@@ -23,6 +23,15 @@ end
 config :replicate,
   replicate_api_token: System.get_env("REPLICATE_API_TOKEN")
 
+config :ex_aws,
+  access_key_id: System.get_env("CLOUDFLARE_ACCESS_KEY_ID"),
+  secret_access_key: System.get_env("CLOUDFLARE_SECRET_ACCESS_KEY"),
+  s3: [
+    scheme: "https://",
+    host: System.get_env("CLOUDFLARE_S3_BUCKET"),
+    region: "us-east-1"
+  ]
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

@@ -24,7 +24,7 @@ defmodule Emoji.Predictions do
   def list_firehose_predictions() do
     Repo.all(
       from p in Prediction,
-        where: not is_nil(p.output),
+        where: not is_nil(p.no_bg_output),
         order_by: [desc: p.inserted_at],
         limit: 40
     )
@@ -33,7 +33,7 @@ defmodule Emoji.Predictions do
   def list_finished_predictions() do
     Repo.all(
       from p in Prediction,
-        where: not is_nil(p.output) and p.score > 3 and p.count_votes > 5,
+        where: not is_nil(p.no_bg_output) and p.score > 3 and p.count_votes > 5,
         order_by: fragment("RANDOM()"),
         limit: 16
     )

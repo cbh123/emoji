@@ -49,17 +49,23 @@ defmodule EmojiWeb.HomeLive do
 
     {:ok, prediction} = Predictions.create_prediction(%{prompt: styled_prompt})
 
-    start_task(fn -> {:image_generated, prediction.id, gen_image(styled_prompt)} end)
+    start_task(fn -> {:image_generated, prediction, gen_image(styled_prompt)} end)
 
     {:noreply,
      socket
      |> stream_insert(:my_predictions, prediction, at: 0)}
   end
 
-  def handle_info({:image_generated, id, image}, socket) do
-    {:ok, prediction} = update_prediction(id, image)
+  def handle_info({:image_generated, prediction, {:ok, r8_prediction}}, socket) do
+    r2_url = save_r2("prediction-#{prediction.id}-emoji", r8_prediction.output |> List.first())
 
-    start_task(fn -> {:background_removed, id, remove_bg(image)} end)
+    {:ok, prediction} =
+      Predictions.update_prediction(prediction, %{
+        emoji_output: r2_url,
+        uuid: r8_prediction.id
+      })
+
+    start_task(fn -> {:background_removed, prediction, remove_bg(prediction.emoji_output)} end)
 
     {:noreply,
      socket
@@ -67,8 +73,9 @@ defmodule EmojiWeb.HomeLive do
      |> put_flash(:info, "Image generated. Starting background removal")}
   end
 
-  def handle_info({:background_removed, id, image}, socket) do
-    {:ok, prediction} = update_prediction(id, image)
+  def handle_info({:background_removed, prediction, image}, socket) do
+    r2_url = save_r2("prediction-#{prediction.id}-nobg", image)
+    {:ok, prediction} = Predictions.update_prediction(prediction, %{no_bg_output: r2_url})
 
     {:noreply,
      socket
@@ -95,15 +102,23 @@ defmodule EmojiWeb.HomeLive do
   end
 
   defp gen_image(prompt) do
-    "fofr/sdxl-emoji:4d2c2e5e40a5cad182e5729b49a08247c22a5954ae20356592caaada42dc8985"
-    |> Replicate.run(prompt: prompt, width: 768, height: 768, num_inference_steps: 30)
-    |> List.first()
-  end
+    model = Replicate.Models.get!("fofr/sdxl-emoji")
 
-  defp update_prediction(id, image) do
-    id
-    |> Predictions.get_prediction!()
-    |> Predictions.update_prediction(%{output: image})
+    version =
+      Replicate.Models.get_version!(
+        model,
+        "4d2c2e5e40a5cad182e5729b49a08247c22a5954ae20356592caaada42dc8985"
+      )
+
+    {:ok, prediction} =
+      Replicate.Predictions.create(version, %{
+        prompt: prompt,
+        width: 768,
+        height: 768,
+        num_inference_steps: 30
+      })
+
+    Replicate.Predictions.wait(prediction)
   end
 
   defp start_task(fun) do
@@ -113,5 +128,19 @@ defmodule EmojiWeb.HomeLive do
       result = fun.()
       send(pid, result)
     end)
+  end
+
+  def save_r2(name, image_url) do
+    {:ok, resp} = :httpc.request(:get, {image_url, []}, [], body_format: :binary)
+    {{_, 200, ~c"OK"}, _headers, image_binary} = resp
+
+    file_name = "#{name}.png"
+    bucket = System.get_env("BUCKET_NAME")
+
+    %{status_code: 200} =
+      ExAws.S3.put_object(bucket, file_name, image_binary)
+      |> ExAws.request!()
+
+    "#{System.get_env("CLOUDFLARE_PUBLIC_URL")}/#{file_name}"
   end
 end
