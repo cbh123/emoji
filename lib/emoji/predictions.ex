@@ -25,7 +25,6 @@ defmodule Emoji.Predictions do
     Repo.all(
       from p in Prediction,
         where: not is_nil(p.output),
-        order_by: {:desc, :inserted_at},
         limit: 100
     )
   end
