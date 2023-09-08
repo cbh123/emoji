@@ -11,6 +11,17 @@ defmodule EmojiWeb.HomeLive do
      |> stream(:predictions, Predictions.list_finished_predictions() |> Enum.reverse())}
   end
 
+  def handle_event("thumbs-up", %{"id" => id}, socket) do
+    prediction = Predictions.get_prediction!(id)
+
+    Predictions.update_prediction(prediction, %{
+      score: prediction.score + 1,
+      count_votes: prediction.count_votes + 1
+    })
+
+    {:noreply, socket}
+  end
+
   def handle_event("validate", %{"prompt" => _prompt}, socket) do
     {:noreply, socket}
   end

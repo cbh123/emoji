@@ -26,7 +26,7 @@ defmodule Emoji.Predictions do
       from p in Prediction,
         where: not is_nil(p.output),
         order_by: [asc: p.inserted_at],
-        limit: 100
+        limit: 40
     )
   end
 
