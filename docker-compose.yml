@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    command: "./dev.sh"
+    ports:
+      - "4000:4000"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    environment:
+      - DB_PASS=
+      - DB_HOST=db
+      - MIX_ENV=dev
+
+  db:
+    image: postgres
