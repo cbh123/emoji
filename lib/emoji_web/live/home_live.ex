@@ -8,7 +8,8 @@ defmodule EmojiWeb.HomeLive do
     {:ok,
      socket
      |> assign(form: to_form(%{"prompt" => ""}))
-     |> stream(:predictions, Predictions.list_finished_predictions() |> Enum.reverse())}
+     |> stream(:predictions, Predictions.list_finished_predictions() |> Enum.reverse())
+     |> stream(:recent_predictions, Predictions.list_firehose_predictions())}
   end
 
   def handle_event("thumbs-up", %{"id" => id}, socket) do

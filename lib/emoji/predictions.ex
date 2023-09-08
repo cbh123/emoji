@@ -21,12 +21,21 @@ defmodule Emoji.Predictions do
     Repo.all(Prediction)
   end
 
+  def list_firehose_predictions() do
+    Repo.all(
+      from p in Prediction,
+        where: not is_nil(p.output),
+        order_by: [desc: p.inserted_at],
+        limit: 40
+    )
+  end
+
   def list_finished_predictions() do
     Repo.all(
       from p in Prediction,
         where: not is_nil(p.output),
         order_by: [asc: p.inserted_at],
-        limit: 40
+        limit: 8
     )
   end
 
