@@ -82,7 +82,7 @@ defmodule EmojiWeb.HomeLive do
      socket
      |> put_flash(
        :info,
-       "AI generated safety rating: #{(String.to_integer(rating) - 10) * -1}/10"
+       "AI generated safety rating: #{10 - String.to_integer(rating)}/10"
      )}
   end
 
