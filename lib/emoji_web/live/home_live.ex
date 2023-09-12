@@ -76,24 +76,8 @@ defmodule EmojiWeb.HomeLive do
         moderator: moderator
       })
 
-    if String.to_integer(rating) >= 9 do
-      {:ok, prediction} =
-        Predictions.update_prediction(prediction, %{
-          emoji_output:
-            "https://github.com/replicate/zoo/assets/14149230/39c124db-a793-4ca9-a9b4-706fe18984ad"
-        })
-
-      {:noreply,
-       socket
-       |> put_flash(
-         :error,
-         "Uh oh, this doesn't seem appropriate. Submit an issue if you think the AI is wrong. #{rating}/10"
-       )
-       |> stream_insert(:my_predictions, prediction)}
-    else
-      start_task(fn -> {:image_generated, prediction, gen_image(prediction.prompt)} end)
-      {:noreply, socket |> put_flash(:info, "AI generated safety rating: #{rating}/10")}
-    end
+    start_task(fn -> {:image_generated, prediction, gen_image(prediction.prompt)} end)
+    {:noreply, socket |> put_flash(:info, "AI generated safety rating: #{rating}/10")}
   end
 
   def handle_info({:image_generated, prediction, {:ok, %{output: nil} = r8_prediction}}, socket) do
