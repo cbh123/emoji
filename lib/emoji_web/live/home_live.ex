@@ -77,7 +77,13 @@ defmodule EmojiWeb.HomeLive do
       })
 
     start_task(fn -> {:image_generated, prediction, gen_image(prediction.prompt)} end)
-    {:noreply, socket |> put_flash(:info, "AI generated safety rating: #{rating}/10")}
+
+    {:noreply,
+     socket
+     |> put_flash(
+       :info,
+       "AI generated safety rating: #{(String.to_integer(rating) - 10) * -1}/10"
+     )}
   end
 
   def handle_info({:image_generated, prediction, {:ok, %{output: nil} = r8_prediction}}, socket) do
