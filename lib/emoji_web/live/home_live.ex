@@ -69,20 +69,27 @@ defmodule EmojiWeb.HomeLive do
      |> stream_insert(:my_predictions, prediction, at: 0)}
   end
 
-  def handle_info({:scored, prediction, {moderator, [" ", rating, " "]}}, socket) do
-    {:ok, _prediction} =
+  def handle_info({:scored, prediction, {moderator, rating}}, socket) do
+    {:ok, prediction} =
       Predictions.update_prediction(prediction, %{
         moderation_score: String.to_integer(rating),
         moderator: moderator
       })
 
     if String.to_integer(rating) >= 9 do
+      {:ok, prediction} =
+        Predictions.update_prediction(prediction, %{
+          emoji_output:
+            "https://github.com/replicate/zoo/assets/14149230/39c124db-a793-4ca9-a9b4-706fe18984ad"
+        })
+
       {:noreply,
        socket
        |> put_flash(
          :error,
          "Uh oh, this doesn't seem appropriate. Submit an issue if you think the AI is wrong. #{rating}/10"
-       )}
+       )
+       |> stream_insert(:my_predictions, prediction)}
     else
       start_task(fn -> {:image_generated, prediction, gen_image(prediction.prompt)} end)
       {:noreply, socket |> put_flash(:info, "AI generated safety rating: #{rating}/10")}
@@ -90,7 +97,7 @@ defmodule EmojiWeb.HomeLive do
   end
 
   def handle_info({:image_generated, prediction, {:ok, %{output: nil} = r8_prediction}}, socket) do
-    {:ok, _prediction} =
+    {:ok, prediction} =
       Predictions.update_prediction(prediction, %{
         emoji_output:
           "https://github.com/replicate/zoo/assets/14149230/39c124db-a793-4ca9-a9b4-706fe18984ad",
@@ -99,7 +106,8 @@ defmodule EmojiWeb.HomeLive do
 
     {:noreply,
      socket
-     |> put_flash(:error, "Uh oh, image generation failed. Likely NSFW input. Try again!")}
+     |> put_flash(:error, "Uh oh, image generation failed. Likely NSFW input. Try again!")
+     |> stream_insert(:my_predictions, prediction)}
   end
 
   def handle_info({:image_generated, prediction, {:ok, r8_prediction}}, socket) do
@@ -164,7 +172,9 @@ defmodule EmojiWeb.HomeLive do
        top_p: 0.9,
        top_k: 50,
        stop_sequences: "[/SAFETY_RANKING]"
-     )}
+     )
+     |> Enum.join()
+     |> String.trim()}
   end
 
   defp gen_image(prompt) do
