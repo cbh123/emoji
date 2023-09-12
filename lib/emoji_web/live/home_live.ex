@@ -152,7 +152,7 @@ defmodule EmojiWeb.HomeLive do
      |> Replicate.run(
        prompt: adjusted_prompt,
        max_new_tokens: 128,
-       temperature: 0.75,
+       temperature: 0.2,
        top_p: 0.9,
        top_k: 50,
        stop_sequences: "[/SAFETY_RANKING]"
