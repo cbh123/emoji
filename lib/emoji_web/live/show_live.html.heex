@@ -46,3 +46,7 @@
     />
   </button>
 </div>
+
+<h2 :if={@prediction.moderation_score} class="mt-4">
+  AI Generated safety rating: <%= @prediction.moderation_score %>
+</h2>

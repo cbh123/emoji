@@ -62,11 +62,23 @@ defmodule EmojiWeb.HomeLive do
         local_user_id: socket.assigns.local_user_id
       })
 
-    start_task(fn -> {:image_generated, prediction, gen_image(styled_prompt)} end)
+    start_task(fn -> {:scored, prediction, moderate(prediction.prompt)} end)
 
     {:noreply,
      socket
      |> stream_insert(:my_predictions, prediction, at: 0)}
+  end
+
+  def handle_info({:scored, prediction, {moderator, [" ", rating, " "]}}, socket) do
+    {:ok, _prediction} =
+      Predictions.update_prediction(prediction, %{
+        moderation_score: String.to_integer(rating),
+        moderator: moderator
+      })
+
+    start_task(fn -> {:image_generated, prediction, gen_image(prediction.prompt)} end)
+
+    {:noreply, socket |> put_flash(:info, "AI generated safety rating: #{rating}/10")}
   end
 
   def handle_info({:image_generated, prediction, {:ok, %{output: nil} = r8_prediction}}, socket) do
@@ -101,7 +113,7 @@ defmodule EmojiWeb.HomeLive do
 
   def handle_info({:background_removed, prediction, image}, socket) do
     # r2_url = save_r2("prediction-#{prediction.id}-nobg", image)
-    send_telegram_message(prediction.prompt, image)
+    send_telegram_message(prediction.prompt, image, prediction.id, prediction.moderation_score)
 
     {:ok, prediction} = Predictions.update_prediction(prediction, %{no_bg_output: image})
 
@@ -127,6 +139,24 @@ defmodule EmojiWeb.HomeLive do
   defp remove_bg(url) do
     "cjwbw/rembg:fb8af171cfa1616ddcf1242c093f9c46bcada5ad4cf6f2fbe8b81b330ec5c003"
     |> Replicate.run(image: url)
+  end
+
+  defp moderate(prompt) do
+    adjusted_prompt = "[PROMPT] #{prompt} [/PROMPT] [SAFETY_RANKING]"
+
+    moderator =
+      "fofr/prompt-classifier:1ffac777bf2c1f5a4a5073faf389fefe59a8b9326b3ca329e9d576cce658a00f"
+
+    {moderator,
+     moderator
+     |> Replicate.run(
+       prompt: adjusted_prompt,
+       max_new_tokens: 128,
+       temperature: 0.75,
+       top_p: 0.9,
+       top_k: 50,
+       stop_sequences: "[/SAFETY_RANKING]"
+     )}
   end
 
   defp gen_image(prompt) do
@@ -172,13 +202,19 @@ defmodule EmojiWeb.HomeLive do
     "#{System.get_env("CLOUDFLARE_PUBLIC_URL")}/#{file_name}"
   end
 
-  def send_telegram_message(prompt, image) do
+  def send_telegram_message(prompt, image, id, score) do
     token = System.fetch_env!("TELEGRAM_BOT_TOKEN")
     chat_id = System.fetch_env!("TELEGRAM_CHAT_ID")
 
     url = "https://api.telegram.org/bot#{token}/sendMessage"
     headers = ["Content-Type": "application/json"]
-    body = Jason.encode!(%{chat_id: chat_id, text: "prompt: #{prompt}, image: #{image}"})
+
+    body =
+      Jason.encode!(%{
+        chat_id: chat_id,
+        text:
+          "prompt: #{prompt}, image: #{image}, url: https://emoji.fly.dev/emoji/#{id}, moderation score: #{score}"
+      })
 
     HTTPoison.post(url, body, headers)
   end

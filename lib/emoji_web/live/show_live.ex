@@ -5,7 +5,7 @@ defmodule EmojiWeb.ShowLive do
 
   def mount(%{"id" => id}, _session, socket) do
     prediction = Predictions.get_prediction!(id)
-    {:ok, socket |> assign(prediction: prediction) |> assign(show_bg: true)}
+    {:ok, socket |> assign(prediction: prediction) |> assign(show_bg: false)}
   end
 
   def handle_event("toggle-bg", _, socket) do
