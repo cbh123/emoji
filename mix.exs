@@ -52,7 +52,11 @@ defmodule Emoji.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:replicate, "~> 1.0.1"},
       {:ex_aws, "~> 2.1"},
-      {:ex_aws_s3, "~> 2.0"}
+      {:ex_aws_s3, "~> 2.0"},
+      {:bumblebee, "~> 0.1"},
+      {:nx, "~> 0.4"},
+      {:exla, "~> 0.4"},
+      {:ex_faiss, github: "elixir-nx/ex_faiss"}
     ]
   end
 
