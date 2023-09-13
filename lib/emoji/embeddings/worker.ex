@@ -23,7 +23,7 @@ defmodule Emoji.Embeddings.Worker do
   end
 
   def handle_info(:work, state) do
-    if Predictions.count_predictions_with_embeddings() < 10000 do
+    if Predictions.count_predictions_with_embeddings() < 1000 do
       prediction = Predictions.get_random_prediction_without_embeddings()
       Logger.info("Creating embeddings for #{prediction.id}")
 
