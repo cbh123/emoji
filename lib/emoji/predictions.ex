@@ -8,6 +8,26 @@ defmodule Emoji.Predictions do
 
   alias Emoji.Predictions.Prediction
 
+  def get_predictions(ids) do
+    from(p in Prediction, where: p.id in ^ids and not is_nil(p.emoji_output)) |> Repo.all()
+  end
+
+  def count_predictions_with_embeddings() do
+    Repo.aggregate(
+      from(p in Prediction, where: not p.embedding |> is_nil()),
+      :count
+    )
+  end
+
+  def get_random_prediction_without_embeddings() do
+    from(p in Prediction,
+      where: is_nil(p.embedding),
+      order_by: fragment("RANDOM()"),
+      limit: 1
+    )
+    |> Repo.one()
+  end
+
   @doc """
   Returns the list of predictions.
 

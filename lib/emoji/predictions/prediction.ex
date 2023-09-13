@@ -13,6 +13,8 @@ defmodule Emoji.Predictions.Prediction do
     field :local_user_id, :string
     field :moderation_score, :integer
     field :moderator, :string
+    field :embedding, :binary
+    field :embedding_model, :string
 
     timestamps()
   end
@@ -30,7 +32,9 @@ defmodule Emoji.Predictions.Prediction do
       :is_featured,
       :local_user_id,
       :moderation_score,
-      :moderator
+      :moderator,
+      :embedding,
+      :embedding_model
     ])
     |> validate_required([:prompt])
   end

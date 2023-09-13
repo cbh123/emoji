@@ -3,7 +3,7 @@ defmodule EmojiWeb.HistoryLive do
   alias Emoji.Predictions
 
   def mount(_params, _session, socket) do
-    {:ok, socket |> assign(local_user_id: nil)}
+    {:ok, socket |> assign(local_user_id: nil) |> assign(results: [])}
   end
 
   def handle_event("assign-user-id", %{"userId" => user_id}, socket) do

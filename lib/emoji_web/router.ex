@@ -20,6 +20,7 @@ defmodule EmojiWeb.Router do
     live "/", HomeLive, :index
     live "/emoji/:id", ShowLive, :show
     live "/emojis", HistoryLive, :index
+    live "/experimental-search", SearchLive, :index
   end
 
   # Other scopes may use custom stacks.
