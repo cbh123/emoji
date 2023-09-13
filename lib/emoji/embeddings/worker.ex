@@ -4,6 +4,7 @@ defmodule Emoji.Embeddings.Worker do
   """
   alias Emoji.Predictions
   alias Emoji.Embeddings
+  import Logger
   use GenServer
 
   @embeddings_model "daanelson/imagebind:0383f62e173dc821ec52663ed22a076d9c970549c209666ac3db181618b7a304"
@@ -22,9 +23,9 @@ defmodule Emoji.Embeddings.Worker do
   end
 
   def handle_info(:work, state) do
-    if Predictions.count_predictions_with_embeddings() < 95 do
-      IO.puts("Running prediction...")
+    if Predictions.count_predictions_with_embeddings() < 10000 do
       prediction = Predictions.get_random_prediction_without_embeddings()
+      Logger.info("Creating embeddings for #{prediction.id}")
 
       embedding =
         prediction.prompt
