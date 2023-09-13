@@ -11,14 +11,15 @@ defmodule Emoji.Embeddings.Index do
   end
 
   def init(_args) do
-    index = ExFaiss.Index.new(1024, "IDMap,Flat")
+    {:ok, index} = HNSWLib.Index.new(:l2, 1024, 100_000)
 
     Emoji.Predictions.list_predictions()
     |> Enum.reduce(index, fn prediction, index ->
       id = prediction.id
       embedding = prediction.embedding
 
-      ExFaiss.Index.add_with_ids(index, Nx.from_binary(embedding, :f32), Nx.tensor([id]))
+      HNSWLib.Index.add_items(index, Nx.from_binary(embedding, :f32), ids: Nx.tensor([id]))
+      index
     end)
 
     Logger.info("Index successfully created")
@@ -34,13 +35,14 @@ defmodule Emoji.Embeddings.Index do
   end
 
   def handle_cast({:add, id, embedding}, index) do
-    index = ExFaiss.Index.add_with_ids(index, embedding, id)
+    HNSWLib.Index.add_items(index, Nx.from_binary(embedding, :f32), ids: Nx.tensor([id]))
+    index
     {:noreply, index}
   end
 
   def handle_call({:search, embedding, k}, _from, index) do
-    results = ExFaiss.Index.search(index, embedding, k)
-    {:reply, results, index}
+    {:ok, labels, dists} = HNSWLib.Index.knn_query(index, embedding, k: k)
+    {:reply, %{labels: labels, distances: dists}, index}
   end
 
   def terminate(reason, _state) do
