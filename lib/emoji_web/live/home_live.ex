@@ -181,7 +181,8 @@ defmodule EmojiWeb.HomeLive do
         prompt: prompt,
         width: 768,
         height: 768,
-        num_inference_steps: 30
+        num_inference_steps: 30,
+        negative_prompt: "racist, xenophobic, antisemitic, islamophobic, bigoted",
       })
 
     Replicate.Predictions.wait(prediction)
