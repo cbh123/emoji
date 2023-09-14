@@ -55,7 +55,6 @@ defmodule Emoji.MixProject do
       {:ex_aws_s3, "~> 2.0"},
       {:bumblebee, "~> 0.1"},
       {:nx, "~> 0.4"},
-      {:exla, "~> 0.4"},
       {:hnswlib, "~> 0.1.2"}
     ]
   end
