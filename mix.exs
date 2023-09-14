@@ -53,8 +53,8 @@ defmodule Emoji.MixProject do
       {:replicate, "~> 1.0.1"},
       {:ex_aws, "~> 2.1"},
       {:ex_aws_s3, "~> 2.0"},
-      {:nx, "~> 0.4"},
-      {:hnswlib, "~> 0.1.2"}
+      {:nx, "~> 0.4"}
+      # {:hnswlib, "~> 0.1.2"}
     ]
   end
 
