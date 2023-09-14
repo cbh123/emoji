@@ -15,7 +15,7 @@ config :emoji, EmojiWeb.Endpoint, cache_static_manifest: "priv/static/cache_mani
 config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: Emoji.Finch
 
 # Do not print debug messages in production
-config :logger, level: :info
+config :logger, handle_sasl_reports: true, level: :info
 
 config :emoji, env: :prod
 
