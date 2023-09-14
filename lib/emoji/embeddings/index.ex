@@ -36,7 +36,6 @@ defmodule Emoji.Embeddings.Index do
 
   def handle_cast({:add, id, embedding}, index) do
     HNSWLib.Index.add_items(index, Nx.from_binary(embedding, :f32), ids: Nx.tensor([id]))
-    index
     {:noreply, index}
   end
 
