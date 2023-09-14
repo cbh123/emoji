@@ -212,8 +212,8 @@ defmodule EmojiWeb.HomeLive do
   end
 
   def send_telegram_message(prompt, image, id, score) do
-    token = System.fetch_env!("TELEGRAM_BOT_TOKEN")
-    chat_id = System.fetch_env!("TELEGRAM_CHAT_ID")
+    token = System.fetch_env("TELEGRAM_BOT_TOKEN")
+    chat_id = System.fetch_env("TELEGRAM_CHAT_ID")
 
     url = "https://api.telegram.org/bot#{token}/sendMessage"
     headers = ["Content-Type": "application/json"]
