@@ -25,7 +25,7 @@ defmodule Emoji.Predictions do
       order_by: fragment("RANDOM()"),
       limit: 1
     )
-    |> Repo.one()
+    |> Repo.one!()
   end
 
   @doc """

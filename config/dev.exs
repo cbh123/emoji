@@ -1,5 +1,7 @@
 import Config
 
+config :emoji, env: :dev
+
 # Configure your database
 config :emoji, Emoji.Repo,
   username: "postgres",

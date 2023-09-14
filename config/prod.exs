@@ -17,5 +17,7 @@ config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: Emoji.Finch
 # Do not print debug messages in production
 config :logger, level: :info
 
+config :emoji, env: :prod
+
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.
