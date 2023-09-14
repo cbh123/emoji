@@ -182,7 +182,7 @@ defmodule EmojiWeb.HomeLive do
         width: 768,
         height: 768,
         num_inference_steps: 30,
-        negative_prompt: "racist, xenophobic, antisemitic, islamophobic, bigoted",
+        negative_prompt: "racist, xenophobic, antisemitic, islamophobic, bigoted"
       })
 
     Replicate.Predictions.wait(prediction)
@@ -212,8 +212,8 @@ defmodule EmojiWeb.HomeLive do
   end
 
   def send_telegram_message(prompt, image, id, score) do
-    token = System.fetch_env("TELEGRAM_BOT_TOKEN")
-    chat_id = System.fetch_env("TELEGRAM_CHAT_ID")
+    {:ok, token} = System.fetch_env("TELEGRAM_BOT_TOKEN")
+    {:ok, chat_id} = System.fetch_env("TELEGRAM_CHAT_ID")
 
     url = "https://api.telegram.org/bot#{token}/sendMessage"
     headers = ["Content-Type": "application/json"]
