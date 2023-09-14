@@ -22,8 +22,16 @@ defmodule Emoji.Embeddings.Worker do
     Process.send_after(self(), :work, 5000)
   end
 
+  defp should_generate?() do
+    case Application.get_env(:emoji, :env) do
+      :prod -> Predictions.count_predictions_with_embeddings() < 1000
+      :dev -> Predictions.count_predictions_with_embeddings() < 50
+      _ -> false
+    end
+  end
+
   def handle_info(:work, state) do
-    if Predictions.count_predictions_with_embeddings() < 1000 do
+    if should_generate?() do
       prediction = Predictions.get_random_prediction_without_embeddings()
       Logger.info("Creating embeddings for #{prediction.id}")
 
