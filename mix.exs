@@ -55,8 +55,8 @@ defmodule Emoji.MixProject do
       {:ex_aws_s3, "~> 2.0"},
       {:bumblebee, "~> 0.1"},
       {:nx, "~> 0.4"},
-      {:exla, "~> 0.4"},
-      {:hnswlib, github: "elixir-nx/hnswlib", version: "0.1.1"}
+      {:exla, "~> 0.4"}
+      # {:hnswlib, github: "elixir-nx/hnswlib", version: "0.1.1"}
     ]
   end
 
