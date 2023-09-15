@@ -46,7 +46,7 @@
             <button
               id={"prediction-#{id}-btn"}
               phx-hook="DownloadImage"
-              phx-value-name={prediction.prompt |> human_name()}
+              phx-value-name={prediction.prompt |> humanize()}
               phx-value-image={prediction.no_bg_output || prediction.emoji_output}
               type="button"
             >
@@ -62,7 +62,7 @@
           navigate={~p"/emoji/#{prediction.id}"}
           class="mt-2 block truncate text-sm font-medium text-gray-900"
         >
-          :<%= human_name(prediction.prompt) %>:
+          :<%= humanize(prediction.prompt) %>:
         </.link>
         <div class={"flex justify-between items-center feedback-#{prediction.id}"}>
           <button
@@ -111,7 +111,7 @@
           <button
             id={"prediction-#{id}-btn"}
             phx-hook="DownloadImage"
-            phx-value-name={prediction.prompt |> human_name()}
+            phx-value-name={prediction.prompt |> humanize()}
             phx-value-image={prediction.no_bg_output || prediction.emoji_output}
             type="button"
           >
