@@ -138,17 +138,8 @@ defmodule EmojiWeb.HomeLive do
      |> put_flash(:info, "Background successfully removed!")}
   end
 
-  defp human_name(name) do
-    dasherize(name)
-  end
-
-  defp dasherize(name) do
-    name
-    |> String.replace(@preprompt, "")
-    |> String.replace("A TOK emoji of an ", "")
-    |> String.split(" ")
-    |> Enum.join("-")
-    |> String.replace("--", "-")
+  defp humanize(name) do
+    Emoji.Utils.humanize(name)
   end
 
   defp remove_bg(url) do
