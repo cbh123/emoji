@@ -3,6 +3,7 @@ defmodule EmojiWeb.HomeLive do
   alias Emoji.Predictions
 
   @preprompt "A TOK emoji of a "
+  @fail_image "https://github.com/replicate/zoo/assets/14149230/39c124db-a793-4ca9-a9b4-706fe18984ad"
 
   def mount(_params, _session, socket) do
     {:ok,
@@ -76,21 +77,29 @@ defmodule EmojiWeb.HomeLive do
         moderator: moderator
       })
 
-    start_task(fn -> {:image_generated, prediction, gen_image(prediction.prompt)} end)
+    if String.to_integer(rating) >= 9 do
+      {:ok, prediction} = Predictions.update_prediction(prediction, %{emoji_output: @fail_image})
 
-    {:noreply,
-     socket
-     |> put_flash(
-       :info,
-       "AI generated safety rating: #{10 - String.to_integer(rating)}/10"
-     )}
+      {:noreply,
+       socket
+       |> put_flash(
+         :error,
+         "Uh oh, this doesn't seem appropriate. Submit an issue on GitHub if you think the AI is wrong. Rating: #{10 - String.to_integer(rating)}/10"
+       )
+       |> stream_insert(:my_predictions, prediction)}
+    else
+      start_task(fn -> {:image_generated, prediction, gen_image(prediction.prompt)} end)
+
+      {:noreply,
+       socket
+       |> put_flash(:info, "AI generated safety rating: #{10 - String.to_integer(rating)}/10")}
+    end
   end
 
   def handle_info({:image_generated, prediction, {:ok, %{output: nil} = r8_prediction}}, socket) do
     {:ok, prediction} =
       Predictions.update_prediction(prediction, %{
-        emoji_output:
-          "https://github.com/replicate/zoo/assets/14149230/39c124db-a793-4ca9-a9b4-706fe18984ad",
+        emoji_output: @fail_image,
         uuid: r8_prediction.id
       })
 
