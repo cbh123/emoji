@@ -18,7 +18,7 @@ defmodule Emoji.Application do
       {Finch, name: Emoji.Finch},
       # Start the Endpoint (http/https)
       EmojiWeb.Endpoint,
-      # {Emoji.Embeddings.Index, []},
+      {Emoji.Embeddings.Index, []},
       Emoji.Embeddings.Worker
       # Start a worker by calling: Emoji.Worker.start_link(arg)
       # {Emoji.Worker, arg}

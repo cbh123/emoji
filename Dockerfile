@@ -24,6 +24,13 @@ FROM ${BUILDER_IMAGE} as builder
 RUN apt-get update -y && apt-get install -y build-essential git curl erlang-dev cmake  \
     && apt-get clean && rm -f /var/lib/apt/lists/*_*
 
+
+# Add Debian testing repository
+RUN echo 'deb http://ftp.debian.org/debian testing main' >> /etc/apt/sources.list
+
+# Upgrade libstdc++6
+RUN apt-get update -y && apt-get -t testing install -y libstdc++6
+
 # prepare build dir
 WORKDIR /app
 
@@ -69,6 +76,12 @@ FROM ${RUNNER_IMAGE}
 
 RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 locales \
   && apt-get clean && rm -f /var/lib/apt/lists/*_*
+
+# Add Debian testing repository
+RUN echo 'deb http://ftp.debian.org/debian testing main' >> /etc/apt/sources.list
+
+# Upgrade libstdc++6
+RUN apt-get update -y && apt-get -t testing install -y libstdc++6
 
 # Set the locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
