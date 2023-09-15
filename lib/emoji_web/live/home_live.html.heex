@@ -127,7 +127,7 @@
         navigate={~p"/emoji/#{prediction.id}"}
         class="mt-2 block truncate text-sm font-medium text-gray-900"
       >
-        :<%= human_name(prediction.prompt) %>:
+        :<%= humanize(prediction.prompt) %>:
       </.link>
       <div class={"flex justify-between items-center feedback-#{prediction.id}"}>
         <button
