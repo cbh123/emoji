@@ -17,14 +17,6 @@ swap_size_mb = 512
   PHX_HOST = "emoji.fly.dev"
   PORT = "8080"
 
-[[services]]
-  internal_port = 5432 # Postgres instance
-  protocol = "tcp"
-
-[[services.ports]]
-  handlers = ["pg_tls"]
-  port = 5432
-
 [http_service]
   internal_port = 8080
   force_https = true
