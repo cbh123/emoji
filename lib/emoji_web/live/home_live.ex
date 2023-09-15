@@ -96,7 +96,10 @@ defmodule EmojiWeb.HomeLive do
     end
   end
 
-  def handle_info({:image_generated, prediction, {:ok, %{output: nil} = r8_prediction}}, socket) do
+  def handle_info(
+        {:image_generated, prediction, {:ok, %{"output" => ""} = r8_prediction}},
+        socket
+      ) do
     {:ok, prediction} =
       Predictions.update_prediction(prediction, %{
         emoji_output: @fail_image,
@@ -114,8 +117,8 @@ defmodule EmojiWeb.HomeLive do
 
     {:ok, prediction} =
       Predictions.update_prediction(prediction, %{
-        emoji_output: r8_prediction.output |> List.first(),
-        uuid: r8_prediction.id
+        emoji_output: r8_prediction["output"] |> List.first(),
+        uuid: r8_prediction["id"]
       })
 
     start_task(fn -> {:background_removed, prediction, remove_bg(prediction.emoji_output)} end)
@@ -168,25 +171,41 @@ defmodule EmojiWeb.HomeLive do
   end
 
   defp gen_image(prompt) do
-    model = Replicate.Models.get!("fofr/sdxl-emoji")
+    url = "https://api.replicate.com/v1/deployments/cbh123/sdxl-emoji/predictions"
+    headers = [Authorization: "Token #{System.get_env("REPLICATE_API_TOKEN")}"]
 
-    version =
-      Replicate.Models.get_version!(
-        model,
-        "4d2c2e5e40a5cad182e5729b49a08247c22a5954ae20356592caaada42dc8985"
-      )
-
-    {:ok, prediction} =
-      Replicate.Predictions.create(version, %{
-        prompt: prompt,
-        width: 768,
-        height: 768,
-        num_inference_steps: 30,
-        negative_prompt: "racist, xenophobic, antisemitic, islamophobic, bigoted"
+    body =
+      Jason.encode!(%{
+        input: %{
+          prompt: prompt,
+          width: 768,
+          height: 768,
+          num_inference_steps: 30,
+          negative_prompt: "racist, xenophobic, antisemitic, islamophobic, bigoted"
+        }
       })
 
-    Replicate.Predictions.wait(prediction)
+    HTTPoison.post!(url, body, headers) |> Map.get(:body) |> Jason.decode() |> wait()
   end
+
+  defp wait({:ok, %{"id" => id, "status" => status} = prediction}) do
+    cond do
+      status in ["starting", "processing"] ->
+        Process.sleep(500)
+
+        HTTPoison.get!("https://api.replicate.com/v1/predictions/#{id}",
+          Authorization: "Token #{System.get_env("REPLICATE_API_TOKEN")}"
+        )
+        |> Map.get(:body)
+        |> Jason.decode()
+        |> wait()
+
+      true ->
+        {:ok, prediction}
+    end
+  end
+
+  defp wait({:error, message}), do: {:error, message}
 
   defp start_task(fun) do
     pid = self()
