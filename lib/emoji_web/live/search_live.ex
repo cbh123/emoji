@@ -3,7 +3,7 @@ defmodule EmojiWeb.SearchLive do
   alias Emoji.Predictions
 
   def mount(_params, _session, socket) do
-    {:ok, socket |> assign(results: [])}
+    {:ok, socket |> assign(results: [], query: nil)}
   end
 
   def handle_event("search", %{"query" => query}, socket) do
@@ -14,7 +14,7 @@ defmodule EmojiWeb.SearchLive do
   def handle_params(%{"q" => query}, _uri, socket) do
     results = Emoji.Embeddings.search_emojis(query)
 
-    {:noreply, assign(socket, :results, results)}
+    {:noreply, socket |> assign(results: results) |> assign(query: query)}
   end
 
   def handle_params(_params, _uri, socket) do
