@@ -11,8 +11,8 @@
     </div>
   </form>
 
-  <ul role="list" class="mt-4 grid grid-cols-3 divide-y divide-gray-200">
-    <li :for={prediction <- @results}>
+  <ul role="list" class="mt-4 gap-6 grid grid-cols-3 divide-y divide-gray-200">
+    <li :for={{prediction, distance} <- @results}>
       <p class="text-sm font-medium text-gray-900">
         <button
           id={"prediction-#{prediction.id}-btn"}
@@ -34,6 +34,9 @@
       >
         :<%= human_name(prediction.prompt) %>:
       </.link>
+      <span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
+        Distance: <%= distance |> floor() %>
+      </span>
     </li>
   </ul>
 </div>

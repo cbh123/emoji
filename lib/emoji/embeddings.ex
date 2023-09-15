@@ -25,10 +25,15 @@ defmodule Emoji.Embeddings do
   def search_emojis(query) do
     embedding = create(query) |> Nx.from_binary(:f32)
 
-    %{labels: labels} = Emoji.Embeddings.Index.search(embedding, 10)
+    %{labels: labels, distances: distances} = Emoji.Embeddings.Index.search(embedding, 10)
 
-    labels
-    |> Nx.to_flat_list()
-    |> Emoji.Predictions.get_predictions()
+    ids = Nx.to_flat_list(labels)
+    distances = Nx.to_flat_list(distances)
+
+    Enum.zip_with(ids, distances, fn id, distance ->
+      prediction = Emoji.Predictions.get_prediction!(id)
+      {prediction, distance}
+    end)
+    |> Enum.sort_by(fn {_prediction, distance} -> distance end)
   end
 end
