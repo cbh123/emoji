@@ -13,6 +13,7 @@ defmodule EmojiWeb.SearchLive do
   @impl true
   def handle_params(%{"q" => query}, _uri, socket) do
     results = Emoji.Embeddings.search_emojis(query)
+
     {:noreply, assign(socket, :results, results)}
   end
 
