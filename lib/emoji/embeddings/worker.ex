@@ -24,7 +24,7 @@ defmodule Emoji.Embeddings.Worker do
 
   defp should_generate?() do
     case Application.get_env(:emoji, :env) do
-      :prod -> Predictions.count_predictions_with_embeddings() < 10_000
+      :prod -> Predictions.count_predictions_with_embeddings() < 50_000
       :dev -> Predictions.count_predictions_with_embeddings() < 50
       _ -> false
     end
