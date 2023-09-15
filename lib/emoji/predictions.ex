@@ -21,7 +21,7 @@ defmodule Emoji.Predictions do
 
   def get_random_prediction_without_embeddings() do
     from(p in Prediction,
-      where: is_nil(p.embedding),
+      where: is_nil(p.embedding) and not is_nil(p.emoji_output) and p.score != 10,
       order_by: fragment("RANDOM()"),
       limit: 1
     )
