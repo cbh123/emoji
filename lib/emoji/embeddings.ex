@@ -25,7 +25,7 @@ defmodule Emoji.Embeddings do
   def search_emojis(query) do
     embedding = create(query) |> Nx.from_binary(:f32)
 
-    %{labels: labels, distances: distances} = Emoji.Embeddings.Index.search(embedding, 15)
+    %{labels: labels, distances: distances} = Emoji.Embeddings.Index.search(embedding, 21)
 
     ids = Nx.to_flat_list(labels)
     distances = Nx.to_flat_list(distances)
