@@ -41,6 +41,10 @@ defmodule Emoji.Predictions do
     Repo.all(Prediction)
   end
 
+  def list_predictions_with_embeddings do
+    Repo.all(from p in Prediction, where: not is_nil(p.embedding) and not is_nil(p.emoji_output))
+  end
+
   def list_firehose_predictions() do
     Repo.all(
       from p in Prediction,
