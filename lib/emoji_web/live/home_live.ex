@@ -51,7 +51,11 @@ defmodule EmojiWeb.HomeLive do
     {:noreply, socket |> assign(local_user_id: user_id)}
   end
 
-  def handle_event("save", %{"prompt" => prompt}, socket) do
+  def handle_event("save", %{"prompt" => prompt, "submit" => "search"}, socket) do
+    {:noreply, socket |> push_navigate(to: ~p"/experimental-search?q=#{prompt}")}
+  end
+
+  def handle_event("save", %{"prompt" => prompt, "submit" => "generate"}, socket) do
     styled_prompt =
       (@preprompt <> String.trim_trailing(String.downcase(prompt)))
       |> String.replace("emoji of a a ", "emoji of a ")
