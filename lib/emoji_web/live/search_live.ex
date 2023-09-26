@@ -3,7 +3,7 @@ defmodule EmojiWeb.SearchLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket |> assign(results: [], query: nil)}
+    {:ok, socket |> assign(results: [], query: nil, loading: false)}
   end
 
   @impl true
@@ -13,25 +13,23 @@ defmodule EmojiWeb.SearchLive do
 
   @impl true
   def handle_params(%{"q" => query}, _uri, socket) do
-    results = Emoji.Embeddings.search_emojis(query)
+    Task.async(fn -> Emoji.Embeddings.search_emojis(query) end)
 
-    {:noreply, socket |> assign(results: results) |> assign(query: query)}
+    {:noreply, socket |> assign(loading: true) |> assign(query: query)}
   end
 
   def handle_params(_params, _uri, socket) do
     {:noreply, socket}
   end
 
-  defp human_name(name) do
-    dasherize(name)
+  @impl true
+  def handle_info({ref, results}, socket) do
+    Process.demonitor(ref, [:flush])
+
+    {:noreply, socket |> assign(results: results, loading: false)}
   end
 
-  defp dasherize(name) do
-    name
-    |> String.replace("A TOK emoji of a ", "")
-    |> String.replace("A TOK emoji of an ", "")
-    |> String.split(" ")
-    |> Enum.join("-")
-    |> String.replace("--", "-")
+  defp humanize(name) do
+    Emoji.Utils.humanize(name)
   end
 end
