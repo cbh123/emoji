@@ -22,17 +22,17 @@
         placeholder="What is your emoji?"
         class=""
       />
+      <.button name="submit" value="generate" phx-disable-with="Saving..." class="self-end ml-2">
+        Generate
+      </.button>
       <.outline_button
         name="submit"
         value="search"
         phx-disable-with="Searching..."
-        class="self-end ml-2 hidden"
+        class="self-end ml-2"
       >
         Search
       </.outline_button>
-      <.button name="submit" value="generate" phx-disable-with="Saving..." class="self-end ml-2">
-        Generate
-      </.button>
     </div>
     <span class="text-xs text-gray-500">
       Try something simple like ‘cat’ or ‘high five’. Click to download, and then add as a Slack emoji!
