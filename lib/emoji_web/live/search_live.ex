@@ -1,11 +1,12 @@
 defmodule EmojiWeb.SearchLive do
   use EmojiWeb, :live_view
-  alias Emoji.Predictions
 
+  @impl true
   def mount(_params, _session, socket) do
     {:ok, socket |> assign(results: [], query: nil)}
   end
 
+  @impl true
   def handle_event("search", %{"query" => query}, socket) do
     {:noreply, push_patch(socket, to: ~p"/experimental-search?q=#{query}")}
   end
