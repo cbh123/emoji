@@ -26,6 +26,18 @@ defmodule EmojiWeb.SearchLive do
   end
 
   @impl true
+  def handle_params(%{"q" => query}, _uri, socket) do
+    Task.async(fn -> Emoji.Embeddings.search_emojis(query, 3, false) end)
+
+    {:noreply,
+     socket
+     |> assign(
+       loading: true,
+       form: to_form(%{"query" => query})
+     )}
+  end
+
+  @impl true
   def handle_params(%{"q" => query, "search_via_images" => search_via_images}, _uri, socket) do
     Task.async(fn -> Emoji.Embeddings.search_emojis(query, 3, search_via_images == "true") end)
 
