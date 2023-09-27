@@ -24,9 +24,15 @@
 
   <div :if={@loading} class="mt-2 animate-pulse">Searching...</div>
 
-  <ul :if={not @loading} role="list" class="mt-4 gap-6 grid grid-cols-3 divide-y divide-gray-200">
-    <li :for={{prediction, distance} <- @results}>
-      <EmojiWeb.Components.emoji id={prediction.id} prediction={prediction} />
+  <ul
+    :if={not @loading}
+    id="emoji-list"
+    phx-update="stream"
+    role="list"
+    class="mt-4 gap-6 grid grid-cols-3 divide-y divide-gray-200"
+  >
+    <li :for={{id, {prediction, distance}} <- @streams.results}>
+      <EmojiWeb.Components.emoji id={id} prediction={prediction} />
       <div class="mt-2">
         <.badge text={"Search distance: #{distance |> round()}"} />
       </div>

@@ -52,7 +52,7 @@ defmodule EmojiWeb.HomeLive do
   end
 
   def handle_event("save", %{"prompt" => prompt, "submit" => "search"}, socket) do
-    {:noreply, socket |> push_navigate(to: ~p"/experimental-search?q=#{prompt}")}
+    {:noreply, socket |> push_navigate(to: ~p"/experimental-search?query=#{prompt}")}
   end
 
   def handle_event("save", %{"prompt" => prompt, "submit" => "generate"}, socket) do

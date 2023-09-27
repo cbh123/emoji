@@ -8,11 +8,16 @@ defmodule EmojiWeb.SearchLive do
     {:ok,
      socket
      |> assign(
-       results: [],
-       query: nil,
        loading: false,
+       num_results: @num_results,
        form: to_form(%{"query" => nil, "search_via_images" => false})
-     )}
+     )
+     |> stream_configure(:results,
+       dom_id: fn {prediction, _distance} ->
+         "prediction-#{prediction.id}"
+       end
+     )
+     |> stream(:results, [])}
   end
 
   @impl true
@@ -23,12 +28,38 @@ defmodule EmojiWeb.SearchLive do
       ) do
     {:noreply,
      push_patch(socket,
-       to: ~p"/experimental-search?q=#{query}&search_via_images=#{search_via_images}"
+       to: ~p"/experimental-search?query=#{query}&search_via_images=#{search_via_images}"
      )}
   end
 
   @impl true
-  def handle_params(%{"q" => query, "search_via_images" => search_via_images}, _uri, socket) do
+  def handle_params(
+        %{
+          "query" => query,
+          "search_via_images" => search_via_images,
+          "num_results" => num_results
+        } = params,
+        _uri,
+        socket
+      ) do
+    Task.async(fn ->
+      Emoji.Embeddings.search_emojis(query, num_results, search_via_images == "true")
+    end)
+
+    {:noreply,
+     socket
+     |> assign(
+       loading: true,
+       form: to_form(params)
+     )}
+  end
+
+  @impl true
+  def handle_params(
+        %{"query" => query, "search_via_images" => search_via_images} = params,
+        _uri,
+        socket
+      ) do
     Task.async(fn ->
       Emoji.Embeddings.search_emojis(query, @num_results, search_via_images == "true")
     end)
@@ -37,19 +68,19 @@ defmodule EmojiWeb.SearchLive do
      socket
      |> assign(
        loading: true,
-       form: to_form(%{"query" => query, "search_via_images" => search_via_images})
+       form: to_form(params)
      )}
   end
 
   @impl true
-  def handle_params(%{"q" => query}, _uri, socket) do
+  def handle_params(%{"query" => query} = params, _uri, socket) do
     Task.async(fn -> Emoji.Embeddings.search_emojis(query, @num_results, false) end)
 
     {:noreply,
      socket
      |> assign(
        loading: true,
-       form: to_form(%{"query" => query})
+       form: to_form(params)
      )}
   end
 
@@ -61,6 +92,9 @@ defmodule EmojiWeb.SearchLive do
   def handle_info({ref, results}, socket) do
     Process.demonitor(ref, [:flush])
 
-    {:noreply, socket |> assign(results: results, loading: false)}
+    {:noreply,
+     socket
+     |> assign(loading: false)
+     |> stream(:results, results, reset: true)}
   end
 end

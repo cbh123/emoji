@@ -6,6 +6,8 @@ defmodule Emoji.Embeddings do
   @doc """
   Creates an embedding and returns it in binary form.
   """
+  def create("", _), do: nil
+
   def create(text, embeddings_model) do
     embeddings_model
     |> Replicate.run(text_input: text, modality: "text")
@@ -16,6 +18,8 @@ defmodule Emoji.Embeddings do
   @doc """
   Creates an image embedding given an image url and returns it in binary form.
   """
+  def create_image("", _), do: nil
+
   def create_image(image_url, embeddings_model) do
     image_uri =
       image_url |> Req.get!() |> Map.get(:body) |> binary_to_data_uri("image/png")
