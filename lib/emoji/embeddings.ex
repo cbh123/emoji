@@ -22,10 +22,11 @@ defmodule Emoji.Embeddings do
     |> String.trim()
   end
 
-  def search_emojis(query) do
+  def search_emojis(query, num_results \\ 9) do
     embedding = create(query) |> Nx.from_binary(:f32)
 
-    %{labels: labels, distances: distances} = Emoji.Embeddings.Index.search(embedding, 10)
+    %{labels: labels, distances: distances} =
+      Emoji.Embeddings.Index.search(embedding, num_results)
 
     ids = Nx.to_flat_list(labels)
     distances = Nx.to_flat_list(distances)

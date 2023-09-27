@@ -13,7 +13,7 @@ defmodule EmojiWeb.SearchLive do
 
   @impl true
   def handle_params(%{"q" => query}, _uri, socket) do
-    Task.async(fn -> Emoji.Embeddings.search_emojis(query) end)
+    Task.async(fn -> Emoji.Embeddings.search_emojis(query, 21) end)
 
     {:noreply, socket |> assign(loading: true) |> assign(query: query)}
   end
