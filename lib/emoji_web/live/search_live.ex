@@ -28,18 +28,6 @@ defmodule EmojiWeb.SearchLive do
   end
 
   @impl true
-  def handle_params(%{"q" => query}, _uri, socket) do
-    Task.async(fn -> Emoji.Embeddings.search_emojis(query, @num_results, false) end)
-
-    {:noreply,
-     socket
-     |> assign(
-       loading: true,
-       form: to_form(%{"query" => query})
-     )}
-  end
-
-  @impl true
   def handle_params(%{"q" => query, "search_via_images" => search_via_images}, _uri, socket) do
     Task.async(fn ->
       Emoji.Embeddings.search_emojis(query, @num_results, search_via_images == "true")
@@ -50,6 +38,18 @@ defmodule EmojiWeb.SearchLive do
      |> assign(
        loading: true,
        form: to_form(%{"query" => query, "search_via_images" => search_via_images})
+     )}
+  end
+
+  @impl true
+  def handle_params(%{"q" => query}, _uri, socket) do
+    Task.async(fn -> Emoji.Embeddings.search_emojis(query, @num_results, false) end)
+
+    {:noreply,
+     socket
+     |> assign(
+       loading: true,
+       form: to_form(%{"query" => query})
      )}
   end
 
