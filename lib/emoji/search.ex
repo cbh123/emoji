@@ -38,6 +38,18 @@ defmodule Emoji.Search do
   def get_query!(id), do: Repo.get!(Query, id)
 
   @doc """
+  Gets a single query by content.
+  """
+  def get_query_by_content(content) do
+    from(q in Query,
+      where: ilike(q.content, ^content),
+      select: q,
+      limit: 1
+    )
+    |> Repo.one()
+  end
+
+  @doc """
   Creates a query.
 
   ## Examples

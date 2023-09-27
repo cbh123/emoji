@@ -6,6 +6,8 @@ defmodule Emoji.Embeddings do
   @doc """
   Creates an embedding and returns it in binary form.
   """
+  require Logger
+
   def create("", _), do: nil
 
   def create(text, embeddings_model) do
@@ -41,16 +43,29 @@ defmodule Emoji.Embeddings do
     "data:#{mime_type};base64,#{base64}"
   end
 
+  defp find_or_create_embedding(search_word) do
+    case Emoji.Search.get_query_by_content(search_word) do
+      nil ->
+        Logger.info("Creating embedding for #{search_word}")
+
+        embedding =
+          create(
+            search_word,
+            "daanelson/imagebind:0383f62e173dc821ec52663ed22a076d9c970549c209666ac3db181618b7a304"
+          )
+
+        {:ok, _query} = Emoji.Search.create_query(%{content: search_word, embedding: embedding})
+        embedding
+
+      %Emoji.Search.Query{} = query ->
+        Logger.info("Embedding already found for #{query.content}")
+        query.embedding
+    end
+  end
+
   def search_emojis(query, num_results \\ 9, via_images \\ false) do
-    embedding_binary =
-      create(
-        query,
-        "daanelson/imagebind:0383f62e173dc821ec52663ed22a076d9c970549c209666ac3db181618b7a304"
-      )
-
+    embedding_binary = find_or_create_embedding(query)
     embedding = Nx.from_binary(embedding_binary, :f32)
-
-    {:ok, _query} = Emoji.Search.create_query(%{content: query, embedding: embedding_binary})
 
     %{labels: labels, distances: distances} =
       if via_images do
