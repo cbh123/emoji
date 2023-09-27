@@ -3,6 +3,7 @@ defmodule Emoji.Embeddings.Index do
   Index for embedding search.
   """
   use GenServer
+  require Logger
   @me __MODULE__
 
   def start_link(_opts) do
