@@ -1,6 +1,7 @@
 import Config
 
 config :emoji, env: :dev
+config :phoenix_live_view, :debug_heex_annotations, true
 
 # Configure your database
 config :emoji, Emoji.Repo,

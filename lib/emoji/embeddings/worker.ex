@@ -55,6 +55,11 @@ defmodule Emoji.Embeddings.Worker do
     prediction
   end
 
+  defp create_image_embedding(%{id: id, no_bg_output: nil}) do
+    Logger.info("No url, skipping #{id}")
+    nil
+  end
+
   defp create_image_embedding(prediction) do
     Logger.info("Creating image embeddings for #{prediction.id}")
 

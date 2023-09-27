@@ -37,7 +37,7 @@ defmodule Emoji.Embeddings do
     "data:#{mime_type};base64,#{base64}"
   end
 
-  def search_emojis(query, num_results \\ 9) do
+  def search_emojis(query, num_results \\ 9, via_images \\ false) do
     embedding =
       create(
         query,
@@ -45,8 +45,14 @@ defmodule Emoji.Embeddings do
       )
       |> Nx.from_binary(:f32)
 
+    IO.inspect(via_images, label: "via images")
+
     %{labels: labels, distances: distances} =
-      Emoji.Embeddings.Index.search(embedding, num_results)
+      if via_images do
+        Emoji.Embeddings.Index.search_images(embedding, num_results)
+      else
+        Emoji.Embeddings.Index.search(embedding, num_results)
+      end
 
     ids = Nx.to_flat_list(labels)
     distances = Nx.to_flat_list(distances)
