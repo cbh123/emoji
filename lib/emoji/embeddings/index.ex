@@ -31,7 +31,7 @@ defmodule Emoji.Embeddings.Index do
   end
 
   def search(embedding, k) do
-    GenServer.call(@me, {:search, embedding, k})
+    GenServer.call(@me, {:search, embedding, k}, 10_000)
   end
 
   def handle_cast({:add, id, embedding}, index) do
