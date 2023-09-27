@@ -118,11 +118,12 @@ defmodule EmojiWeb.HomeLive do
 
   def handle_info({:image_generated, prediction, {:ok, r8_prediction}}, socket) do
     # r2_url = save_r2("prediction-#{prediction.id}-emoji", r8_prediction.output |> List.first())
+    r8_prediction |> IO.inspect(label: "r8_prediction")
 
     {:ok, prediction} =
       Predictions.update_prediction(prediction, %{
-        emoji_output: r8_prediction["output"] |> List.first(),
-        uuid: r8_prediction["id"]
+        emoji_output: r8_prediction.output |> List.first(),
+        uuid: r8_prediction.id
       })
 
     start_task(fn -> {:background_removed, prediction, remove_bg(prediction.emoji_output)} end)
@@ -175,41 +176,22 @@ defmodule EmojiWeb.HomeLive do
   end
 
   defp gen_image(prompt) do
-    url = "https://api.replicate.com/v1/deployments/cbh123/sdxl-emoji/predictions"
-    headers = [Authorization: "Token #{System.get_env("REPLICATE_API_TOKEN")}"]
+    {:ok, deployment} = Replicate.Deployments.get("cbh123/sdxl-emoji")
 
-    body =
-      Jason.encode!(%{
-        input: %{
-          prompt: prompt,
-          width: 512,
-          height: 512,
-          num_inference_steps: 30,
-          negative_prompt: "racist, xenophobic, antisemitic, islamophobic, bigoted"
-        }
-      })
+    {:ok, prediction} =
+      Replicate.Deployments.create_prediction(deployment,
+        prompt: prompt,
+        width: 512,
+        height: 512,
+        num_inference_steps: 30,
+        negative_prompt: "racist, xenophobic, antisemitic, islamophobic, bigoted"
+      )
+      |> wait()
 
-    HTTPoison.post!(url, body, headers) |> Map.get(:body) |> Jason.decode() |> wait()
+    {:ok, prediction}
   end
 
-  defp wait({:ok, %{"id" => id, "status" => status} = prediction}) do
-    cond do
-      status in ["starting", "processing"] ->
-        Process.sleep(500)
-
-        HTTPoison.get!("https://api.replicate.com/v1/predictions/#{id}",
-          Authorization: "Token #{System.get_env("REPLICATE_API_TOKEN")}"
-        )
-        |> Map.get(:body)
-        |> Jason.decode()
-        |> wait()
-
-      true ->
-        {:ok, prediction}
-    end
-  end
-
-  defp wait({:error, message}), do: {:error, message}
+  defp wait({:ok, prediction}), do: Replicate.Predictions.wait(prediction)
 
   defp start_task(fun) do
     pid = self()
