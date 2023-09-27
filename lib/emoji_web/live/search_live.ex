@@ -1,6 +1,8 @@
 defmodule EmojiWeb.SearchLive do
   use EmojiWeb, :live_view
 
+  @num_results 21
+
   @impl true
   def mount(_params, _session, socket) do
     {:ok,
@@ -27,7 +29,7 @@ defmodule EmojiWeb.SearchLive do
 
   @impl true
   def handle_params(%{"q" => query}, _uri, socket) do
-    Task.async(fn -> Emoji.Embeddings.search_emojis(query, 3, false) end)
+    Task.async(fn -> Emoji.Embeddings.search_emojis(query, @num_results, false) end)
 
     {:noreply,
      socket
@@ -39,7 +41,9 @@ defmodule EmojiWeb.SearchLive do
 
   @impl true
   def handle_params(%{"q" => query, "search_via_images" => search_via_images}, _uri, socket) do
-    Task.async(fn -> Emoji.Embeddings.search_emojis(query, 3, search_via_images == "true") end)
+    Task.async(fn ->
+      Emoji.Embeddings.search_emojis(query, @num_results, search_via_images == "true")
+    end)
 
     {:noreply,
      socket
