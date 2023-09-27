@@ -22,31 +22,73 @@ defmodule Emoji.Embeddings.Worker do
     Process.send_after(self(), :work, 5000)
   end
 
-  defp should_generate?() do
+  defp should_generate_text_embedding?() do
     case Application.get_env(:emoji, :env) do
-      :prod -> Predictions.count_predictions_with_embeddings() < 100_000
-      :dev -> Predictions.count_predictions_with_embeddings() < 50
+      :prod -> Predictions.count_predictions_with_text_embeddings() < 100_000
+      :dev -> Predictions.count_predictions_with_text_embeddings() < 50
       _ -> false
     end
   end
 
+  defp should_generate_image_embedding?() do
+    case Application.get_env(:emoji, :env) do
+      :prod -> Predictions.count_predictions_with_image_embeddings() < 10_000
+      :dev -> Predictions.count_predictions_with_image_embeddings() < 50
+      _ -> false
+    end
+  end
+
+  defp create_text_embedding(prediction) do
+    Logger.info("Creating text embeddings for #{prediction.id}")
+
+    embedding =
+      prediction.prompt
+      |> Embeddings.clean()
+      |> Embeddings.create(@embeddings_model)
+
+    {:ok, prediction} =
+      Predictions.update_prediction(prediction, %{
+        embedding: embedding,
+        embedding_model: @embeddings_model
+      })
+
+    prediction
+  end
+
+  defp create_image_embedding(prediction) do
+    Logger.info("Creating image embeddings for #{prediction.id}")
+
+    image_embedding =
+      prediction.no_bg_output
+      |> Embeddings.create_image(@embeddings_model)
+
+    {:ok, prediction} =
+      Predictions.update_prediction(prediction, %{
+        image_embedding: image_embedding
+      })
+
+    prediction
+  end
+
   def handle_info(:work, state) do
-    if should_generate?() do
-      prediction = Predictions.get_random_prediction_without_embeddings()
-      Logger.info("Creating embeddings for #{prediction.id}")
+    cond do
+      should_generate_image_embedding?() and should_generate_text_embedding?() ->
+        Predictions.get_random_prediction_without_text_embeddings() |> create_text_embedding()
+        Predictions.get_random_prediction_without_image_embeddings() |> create_image_embedding()
 
-      embedding =
-        prediction.prompt
-        |> Embeddings.clean()
-        |> Embeddings.create(@embeddings_model)
+        schedule_creation()
 
-      {:ok, _prediction} =
-        Predictions.update_prediction(prediction, %{
-          embedding: embedding,
-          embedding_model: @embeddings_model
-        })
+      should_generate_image_embedding?() ->
+        Predictions.get_random_prediction_without_image_embeddings() |> create_image_embedding()
 
-      schedule_creation()
+        schedule_creation()
+
+      should_generate_text_embedding?() ->
+        Predictions.get_random_prediction_without_text_embeddings() |> create_text_embedding()
+        schedule_creation()
+
+      true ->
+        nil
     end
 
     {:noreply, state}

@@ -55,7 +55,9 @@ defmodule Emoji.MixProject do
       {:ex_aws_s3, "~> 2.0"},
       {:nx, "~> 0.4"},
       {:hnswlib, "~> 0.1.2"},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:image, "~> 0.37"},
+      {:req, "~> 0.4.3"}
     ]
   end
 

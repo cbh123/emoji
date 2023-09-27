@@ -12,16 +12,32 @@ defmodule Emoji.Predictions do
     from(p in Prediction, where: p.id in ^ids and not is_nil(p.emoji_output)) |> Repo.all()
   end
 
-  def count_predictions_with_embeddings() do
+  def count_predictions_with_text_embeddings() do
     Repo.aggregate(
       from(p in Prediction, where: not p.embedding |> is_nil()),
       :count
     )
   end
 
-  def get_random_prediction_without_embeddings() do
+  def count_predictions_with_image_embeddings() do
+    Repo.aggregate(
+      from(p in Prediction, where: not p.image_embedding |> is_nil()),
+      :count
+    )
+  end
+
+  def get_random_prediction_without_text_embeddings() do
     from(p in Prediction,
       where: is_nil(p.embedding) and not is_nil(p.emoji_output) and p.score != 10,
+      order_by: fragment("RANDOM()"),
+      limit: 1
+    )
+    |> Repo.one!()
+  end
+
+  def get_random_prediction_without_image_embeddings() do
+    from(p in Prediction,
+      where: is_nil(p.image_embedding) and not is_nil(p.emoji_output) and p.score != 10,
       order_by: fragment("RANDOM()"),
       limit: 1
     )

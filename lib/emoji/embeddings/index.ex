@@ -17,8 +17,16 @@ defmodule Emoji.Embeddings.Index do
     |> Enum.reduce(index, fn prediction, index ->
       id = prediction.id
       embedding = prediction.embedding
+      # image_embedding = prediction.image_embedding
 
       HNSWLib.Index.add_items(index, Nx.from_binary(embedding, :f32), ids: Nx.tensor([id]))
+
+      # if image_embedding != nil do
+      #   HNSWLib.Index.add_items(index, Nx.from_binary(image_embedding, :f32),
+      #     ids: Nx.tensor([id])
+      #   )
+      # end
+
       index
     end)
 
