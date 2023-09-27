@@ -28,8 +28,4 @@ defmodule EmojiWeb.SearchLive do
 
     {:noreply, socket |> assign(results: results, loading: false)}
   end
-
-  defp humanize(name) do
-    Emoji.Utils.humanize(name)
-  end
 end

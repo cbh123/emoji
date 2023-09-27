@@ -1,7 +1,6 @@
 defmodule EmojiWeb.HomeLive do
   use EmojiWeb, :live_view
   alias Emoji.Predictions
-  alias EmojiWeb.Emoji
 
   @preprompt "A TOK emoji of a "
   @fail_image "https://github.com/replicate/zoo/assets/14149230/39c124db-a793-4ca9-a9b4-706fe18984ad"
@@ -145,10 +144,6 @@ defmodule EmojiWeb.HomeLive do
      socket
      |> stream_insert(:my_predictions, prediction)
      |> put_flash(:info, "Background successfully removed!")}
-  end
-
-  defp humanize(name) do
-    Emoji.Utils.humanize(name)
   end
 
   defp remove_bg(url) do
