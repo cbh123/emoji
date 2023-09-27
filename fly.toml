@@ -14,7 +14,7 @@ swap_size_mb = 512
   release_command = "/app/bin/migrate"
 
 [env]
-  PHX_HOST = "emoji.fly.dev"
+  PHX_HOST = "emojigen.com"
   PORT = "8080"
 
 [http_service]
