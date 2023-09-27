@@ -118,7 +118,6 @@ defmodule EmojiWeb.HomeLive do
 
   def handle_info({:image_generated, prediction, {:ok, r8_prediction}}, socket) do
     # r2_url = save_r2("prediction-#{prediction.id}-emoji", r8_prediction.output |> List.first())
-    r8_prediction |> IO.inspect(label: "r8_prediction")
 
     {:ok, prediction} =
       Predictions.update_prediction(prediction, %{
