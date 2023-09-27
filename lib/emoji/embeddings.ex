@@ -38,14 +38,15 @@ defmodule Emoji.Embeddings do
   end
 
   def search_emojis(query, num_results \\ 9, via_images \\ false) do
-    embedding =
+    embedding_binary =
       create(
         query,
         "daanelson/imagebind:0383f62e173dc821ec52663ed22a076d9c970549c209666ac3db181618b7a304"
       )
-      |> Nx.from_binary(:f32)
 
-    IO.inspect(via_images, label: "via images")
+    embedding = Nx.from_binary(embedding_binary, :f32)
+
+    {:ok, _query} = Emoji.Search.create_query(%{content: query, embedding: embedding_binary})
 
     %{labels: labels, distances: distances} =
       if via_images do
