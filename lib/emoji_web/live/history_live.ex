@@ -12,17 +12,4 @@ defmodule EmojiWeb.HistoryLive do
      |> assign(local_user_id: user_id)
      |> stream(:predictions, Predictions.list_user_predictions(user_id))}
   end
-
-  defp human_name(name) do
-    dasherize(name)
-  end
-
-  defp dasherize(name) do
-    name
-    |> String.replace("A TOK emoji of a ", "")
-    |> String.replace("A TOK emoji of an ", "")
-    |> String.split(" ")
-    |> Enum.join("-")
-    |> String.replace("--", "-")
-  end
 end

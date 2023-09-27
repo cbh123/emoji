@@ -17,31 +17,8 @@
   <div :if={@loading} class="mt-2 animate-pulse">Searching...</div>
 
   <ul :if={not @loading} role="list" class="mt-4 gap-6 grid grid-cols-3 divide-y divide-gray-200">
-    <li :for={{prediction, distance} <- @results}>
-      <p class="text-sm font-medium text-gray-900">
-        <button
-          id={"prediction-#{prediction.id}-btn"}
-          phx-hook="DownloadImage"
-          phx-value-name={prediction.prompt}
-          phx-value-image={prediction.no_bg_output || prediction.emoji_output}
-          type="button"
-        >
-          <img
-            src={prediction.no_bg_output || prediction.emoji_output}
-            alt={prediction.prompt}
-            class="pointer-events-none object-cover group-hover:opacity-75"
-          />
-        </button>
-      </p>
-      <.link
-        navigate={~p"/emoji/#{prediction.id}"}
-        class="mt-2 block truncate text-sm font-medium text-gray-900"
-      >
-        :<%= humanize(prediction.prompt) %>:
-      </.link>
-      <span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
-        Distance: <%= distance |> floor() %>
-      </span>
+    <li :for={{prediction, _distance} <- @results}>
+      <EmojiWeb.Components.emoji id={prediction.id} prediction={prediction} />
     </li>
   </ul>
 </div>

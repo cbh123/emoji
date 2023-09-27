@@ -10,34 +10,7 @@
     class="grid grid-cols-2 mt-6 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
   >
     <li :for={{id, prediction} <- @streams.predictions} id={id} class="relative">
-      <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-black-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
-        <%= if is_nil(prediction.emoji_output) and is_nil(prediction.no_bg_output) do %>
-          <div class="flex items-center justify-center h-36">
-            <p class="animate-pulse ">Loading...</p>
-          </div>
-        <% else %>
-          <button
-            id={"prediction-#{id}-btn"}
-            phx-hook="DownloadImage"
-            phx-value-name={prediction.prompt |> human_name()}
-            phx-value-image={prediction.no_bg_output || prediction.emoji_output}
-            type="button"
-          >
-            <img
-              src={prediction.no_bg_output || prediction.emoji_output}
-              alt={prediction.prompt}
-              class="pointer-events-none object-cover group-hover:opacity-75"
-            />
-          </button>
-        <% end %>
-      </div>
-
-      <.link
-        navigate={~p"/emoji/#{prediction.id}"}
-        class="mt-2 block truncate text-sm font-medium text-gray-900"
-      >
-        :<%= human_name(prediction.prompt) %>:
-      </.link>
+      <EmojiWeb.Components.emoji_no_feedback id={id} prediction={prediction} />
     </li>
   </ul>
 </div>

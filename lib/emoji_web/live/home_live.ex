@@ -1,6 +1,7 @@
 defmodule EmojiWeb.HomeLive do
   use EmojiWeb, :live_view
   alias Emoji.Predictions
+  alias EmojiWeb.Emoji
 
   @preprompt "A TOK emoji of a "
   @fail_image "https://github.com/replicate/zoo/assets/14149230/39c124db-a793-4ca9-a9b4-706fe18984ad"
