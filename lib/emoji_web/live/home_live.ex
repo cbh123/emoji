@@ -182,8 +182,8 @@ defmodule EmojiWeb.HomeLive do
       Jason.encode!(%{
         input: %{
           prompt: prompt,
-          width: 768,
-          height: 768,
+          width: 512,
+          height: 512,
           num_inference_steps: 30,
           negative_prompt: "racist, xenophobic, antisemitic, islamophobic, bigoted"
         }
