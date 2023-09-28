@@ -1,8 +1,9 @@
 defmodule EmojiWeb.Components do
-  import EmojiWeb.Gettext
   use EmojiWeb, :html
 
+  attr :id, :string, required: true
   attr :class, :string, default: nil
+  attr :prediction, :map, required: true
 
   def emoji(assigns) do
     ~H"""

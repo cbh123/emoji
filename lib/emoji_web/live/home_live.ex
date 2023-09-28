@@ -118,11 +118,11 @@ defmodule EmojiWeb.HomeLive do
   end
 
   def handle_info({:image_generated, prediction, {:ok, r8_prediction}}, socket) do
-    # r2_url = save_r2("prediction-#{prediction.id}-emoji", r8_prediction.output |> List.first())
+    r2_url = save_r2("prediction-#{prediction.id}-emoji", r8_prediction.output |> List.first())
 
     {:ok, prediction} =
       Predictions.update_prediction(prediction, %{
-        emoji_output: r8_prediction.output |> List.first(),
+        emoji_output: r2_url,
         uuid: r8_prediction.id
       })
 
@@ -135,10 +135,10 @@ defmodule EmojiWeb.HomeLive do
   end
 
   def handle_info({:background_removed, prediction, image}, socket) do
-    # r2_url = save_r2("prediction-#{prediction.id}-nobg", image)
+    r2_url = save_r2("prediction-#{prediction.id}-nobg", image)
     send_telegram_message(prediction.prompt, image, prediction.id, prediction.moderation_score)
 
-    {:ok, prediction} = Predictions.update_prediction(prediction, %{no_bg_output: image})
+    {:ok, prediction} = Predictions.update_prediction(prediction, %{no_bg_output: r2_url})
 
     {:noreply,
      socket
@@ -199,9 +199,7 @@ defmodule EmojiWeb.HomeLive do
   end
 
   def save_r2(name, image_url) do
-    {:ok, resp} = :httpc.request(:get, {image_url, []}, [], body_format: :binary)
-    {{_, 200, ~c"OK"}, _headers, image_binary} = resp
-
+    image_binary = Req.get!(image_url).body
     file_name = "#{name}.png"
     bucket = System.get_env("BUCKET_NAME")
 
