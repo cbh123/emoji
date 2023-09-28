@@ -51,6 +51,17 @@
       </li>
     </ul>
   </div>
+  <.header class="mt-12">Latest</.header>
+    <ul
+    id="latest-predictions"
+    phx-update="stream"
+    role="list"
+    class="mt-6 flex overflow-x-scroll gap-x-4 sm:gap-x-6"
+  >
+    <li :for={{id, prediction} <- @streams.latest_predictions} id={id} class="relative flex-none">
+      <EmojiWeb.Components.emoji id={id} class="w-52" prediction={prediction} />
+    </li>
+  </ul>
 
   <.header class="mt-12">Featured</.header>
   <ul

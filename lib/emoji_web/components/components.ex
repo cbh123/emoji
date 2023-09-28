@@ -1,10 +1,15 @@
 defmodule EmojiWeb.Components do
+  import EmojiWeb.Gettext
   use EmojiWeb, :html
+
+  attr :class, :string, default: nil
 
   def emoji(assigns) do
     ~H"""
+    <div class={@class}>
       <.image id={@id} prediction={@prediction} />
       <.feedback id={@id} prediction={@prediction} />
+    </div>
     """
   end
 
@@ -16,7 +21,7 @@ defmodule EmojiWeb.Components do
 
   defp image(assigns) do
     ~H"""
-    <div class="group aspect-h-7 aspect-w-10 block w-full overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-black-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
+    <div class="group aspect-h-10 aspect-w-10 block overflow-hidden rounded-lg bg-gray-100 focus-within:ring-2 focus-within:ring-black-500 focus-within:ring-offset-2 focus-within:ring-offset-gray-100">
          <%= if is_nil(@prediction.emoji_output) and is_nil(@prediction.no_bg_output) do %>
            <div class="flex items-center justify-center h-36">
              <p class="animate-pulse ">Loading...</p>

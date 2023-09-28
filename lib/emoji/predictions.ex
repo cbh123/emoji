@@ -67,12 +67,12 @@ defmodule Emoji.Predictions do
     )
   end
 
-  def list_firehose_predictions() do
+  def list_latest_safe_predictions(limit) do
     Repo.all(
       from p in Prediction,
-        where: not is_nil(p.no_bg_output),
+        where: not is_nil(p.no_bg_output) and p.moderation_score <= 5,
         order_by: [desc: p.inserted_at],
-        limit: 100
+        limit: ^limit
     )
   end
 
