@@ -12,7 +12,7 @@ defmodule Emoji.Embeddings.Index do
 
   def init(_args) do
     {:ok, full_index} = HNSWLib.Index.new(:l2, 1024, 100_000)
-    {:ok, image_index} = HNSWLib.Index.new(:l2, 1024, 10_000)
+    {:ok, image_index} = HNSWLib.Index.new(:l2, 1024, 100_000)
 
     Emoji.Predictions.list_predictions_with_text_embeddings()
     |> Enum.each(fn prediction ->

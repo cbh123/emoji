@@ -32,7 +32,7 @@ defmodule Emoji.Embeddings.Worker do
 
   defp should_generate_image_embedding?() do
     case Application.get_env(:emoji, :env) do
-      :prod -> Predictions.count_predictions_with_image_embeddings() < 10_000
+      :prod -> Predictions.count_predictions_with_image_embeddings() < 100_000
       :dev -> Predictions.count_predictions_with_image_embeddings() < 25
       _ -> false
     end
