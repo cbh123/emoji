@@ -25,14 +25,16 @@
       <.button name="submit" value="generate" phx-disable-with="Saving..." class="self-end ml-2">
         Generate
       </.button>
-      <.outline_button
-        name="submit"
-        value="search"
-        phx-disable-with="Searching..."
-        class="self-end ml-2"
-      >
-        Search
-      </.outline_button>
+      <div class="hidden">
+        <.outline_button
+          name="submit"
+          value="search"
+          phx-disable-with="Searching..."
+          class="self-end ml-2"
+        >
+          Search
+        </.outline_button>
+      </div>
     </div>
     <span class="text-xs text-gray-500">
       Try something simple like ‘cat’ or ‘high five’. Click to download, and then add as a Slack emoji!
@@ -52,7 +54,7 @@
     </ul>
   </div>
   <.header class="mt-12">Latest</.header>
-    <ul
+  <ul
     id="latest-predictions"
     phx-update="stream"
     role="list"
