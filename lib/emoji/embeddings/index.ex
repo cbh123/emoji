@@ -11,25 +11,25 @@ defmodule Emoji.Embeddings.Index do
   end
 
   def init(_args) do
-    {:ok, full_index} = HNSWLib.Index.new(:l2, 1024, 100_000)
-    {:ok, image_index} = HNSWLib.Index.new(:l2, 1024, 100_000)
+    # {:ok, full_index} = HNSWLib.Index.new(:l2, 1024, 100_000)
+    # {:ok, image_index} = HNSWLib.Index.new(:l2, 1024, 100_000)
 
-    Emoji.Predictions.list_predictions_with_text_embeddings()
-    |> Enum.each(fn prediction ->
-      HNSWLib.Index.add_items(full_index, Nx.from_binary(prediction.embedding, :f32),
-        ids: Nx.tensor([prediction.id])
-      )
-    end)
+    # Emoji.Predictions.list_predictions_with_text_embeddings()
+    # |> Enum.each(fn prediction ->
+    #   HNSWLib.Index.add_items(full_index, Nx.from_binary(prediction.embedding, :f32),
+    #     ids: Nx.tensor([prediction.id])
+    #   )
+    # end)
 
-    Emoji.Predictions.list_predictions_with_image_embeddings()
-    |> Enum.each(fn prediction ->
-      HNSWLib.Index.add_items(image_index, Nx.from_binary(prediction.image_embedding, :f32),
-        ids: Nx.tensor([prediction.id])
-      )
-    end)
+    # Emoji.Predictions.list_predictions_with_image_embeddings()
+    # |> Enum.each(fn prediction ->
+    #   HNSWLib.Index.add_items(image_index, Nx.from_binary(prediction.image_embedding, :f32),
+    #     ids: Nx.tensor([prediction.id])
+    #   )
+    # end)
 
     Logger.info("Index successfully created")
-    {:ok, %{full_index: full_index, image_index: image_index}}
+    {:ok, %{full_index: %{}, image_index: %{}}}
   end
 
   def search(embedding, k) do
@@ -40,6 +40,14 @@ defmodule Emoji.Embeddings.Index do
   def search_images(embedding, k) do
     Logger.info("Searching images")
     GenServer.call(@me, {:search_images, embedding, k}, 15_000)
+  end
+
+  def get_image_index() do
+    GenServer.call(@me, :get_image_index)
+  end
+
+  def handle_call(:get_image_index, _from, %{image_index: image_index} = index_dict) do
+    {:reply, image_index, index_dict}
   end
 
   def handle_call({:search, embedding, k}, _from, %{full_index: index} = index_dict) do
