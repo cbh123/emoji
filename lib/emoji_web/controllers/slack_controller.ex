@@ -5,7 +5,7 @@ defmodule EmojiWeb.SlackController do
 
   def command(conn, params) do
     # Modify based on the structure of your response
-    {:ok, body} = send_message("⏳ Generating AI #{params["text"]}...", params["channel_id"])
+    {:ok, body} = send_ephemeral_message("⏳ Generating AI #{params["text"]}...", params)
 
     Task.async(fn -> process_request(params, body["message"]["ts"]) end)
 
@@ -15,15 +15,21 @@ defmodule EmojiWeb.SlackController do
   defp process_request(params, message_ts) do
     {:ok, prediction} = gen_image(params["text"])
 
-    image = prediction.output |> List.first()
+    case prediction.output do
+      [image] ->
+        {:ok, _params} =
+          send_ephemeral_message("🖌️ Removing background...", params)
 
-    {:ok, %{status_code: 200}} =
-      update_slack_message(params["channel_id"], message_ts, "🖌️ Removing background...")
+        image = remove_bg(image)
 
-    image = remove_bg(image)
+        {:ok, _params} =
+          send_ephemeral_message("🎉 Done!", params)
 
-    {:ok, %{status_code: 200}} =
-      update_slack_message(params["channel_id"], message_ts, image, params["text"])
+        send_completed_message(params["text"], image, params)
+
+      nil ->
+        send_ephemeral_message("Failed :(", params)
+    end
   end
 
   defp update_slack_message(channel_id, timestamp, text) do
@@ -42,6 +48,7 @@ defmodule EmojiWeb.SlackController do
     }
 
     HTTPoison.post(url, Jason.encode!(payload), headers)
+    |> IO.inspect(label: "update_slack_message")
   end
 
   defp update_slack_message(channel_id, timestamp, image, text) do
@@ -74,8 +81,48 @@ defmodule EmojiWeb.SlackController do
     HTTPoison.post(url, Jason.encode!(payload), headers)
   end
 
-  defp send_message(message, channel_id) do
+  defp send_completed_message(text, image, %{"channel_id" => channel_id} = params) do
     url = "https://slack.com/api/chat.postMessage"
+
+    headers = [
+      {"Authorization", "Bearer #{System.fetch_env!("SLACK_API_TOKEN")}"},
+      {"Content-type", "application/json"}
+    ]
+
+    payload = %{
+      "channel" => channel_id,
+      # This ensures the correct message is updated
+      "text" => text,
+      "blocks" => [
+        %{
+          type: "section",
+          text: %{
+            type: "mrkdwn",
+            text:
+              "AI #{text} by @#{params["user_name"]} and <https://replicate.com/fofr/sdxl-emoji|fofr/sdxl-emoji>"
+          }
+        },
+        %{
+          type: "image",
+          title: %{
+            type: "plain_text",
+            text: text
+          },
+          block_id: "image4",
+          image_url: image,
+          alt_text: text
+        }
+      ]
+    }
+
+    {:ok, %{status_code: 200} = response} =
+      HTTPoison.post(url, Jason.encode!(payload), headers) |> IO.inspect(label: "completed")
+
+    {:ok, Jason.decode!(response.body)}
+  end
+
+  defp send_ephemeral_message(message, %{"channel_id" => channel_id, "user_id" => user_id}) do
+    url = "https://slack.com/api/chat.postEphemeral"
 
     headers = [
       {"Authorization", "Bearer #{System.fetch_env!("SLACK_API_TOKEN")}"},
@@ -85,6 +132,7 @@ defmodule EmojiWeb.SlackController do
     payload = %{
       # You can also get this from the initial request params
       "channel" => channel_id,
+      "user" => user_id,
       "text" => message
     }
 
