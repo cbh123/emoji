@@ -24,9 +24,10 @@ defmodule EmojiWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", EmojiWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", EmojiWeb do
+    pipe_through :api
+    post "/slack-command", SlackController, :command
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:emoji, :dev_routes) do
