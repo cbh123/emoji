@@ -51,36 +51,6 @@ defmodule EmojiWeb.SlackController do
     |> IO.inspect(label: "update_slack_message")
   end
 
-  defp update_slack_message(channel_id, timestamp, image, text) do
-    url = "https://slack.com/api/chat.update"
-
-    headers = [
-      {"Authorization", "Bearer #{System.fetch_env!("SLACK_API_TOKEN")}"},
-      {"Content-type", "application/json"}
-    ]
-
-    payload = %{
-      "channel" => channel_id,
-      # This ensures the correct message is updated
-      "ts" => timestamp,
-      "text" => text,
-      "blocks" => [
-        %{
-          type: "image",
-          title: %{
-            type: "plain_text",
-            text: text
-          },
-          block_id: "image4",
-          image_url: image,
-          alt_text: text
-        }
-      ]
-    }
-
-    HTTPoison.post(url, Jason.encode!(payload), headers)
-  end
-
   defp send_completed_message(text, image, %{"channel_id" => channel_id} = params) do
     url = "https://slack.com/api/chat.postMessage"
 
