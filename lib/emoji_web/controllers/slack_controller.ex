@@ -1,9 +1,11 @@
 defmodule EmojiWeb.SlackController do
   use EmojiWeb, :controller
 
+  @preprompt "A TOK emoji of a "
+
   def command(conn, params) do
     # Modify based on the structure of your response
-    {:ok, body} = send_message("⏳ Generating...", params["channel_id"])
+    {:ok, body} = send_message("⏳ Generating AI #{params["text"]}...", params["channel_id"])
 
     Task.async(fn -> process_request(params, body["message"]["ts"]) end)
 
@@ -91,11 +93,16 @@ defmodule EmojiWeb.SlackController do
   end
 
   defp gen_image(prompt) do
+    styled_prompt =
+      (@preprompt <> String.trim_trailing(String.downcase(prompt)))
+      |> String.replace("emoji of a a ", "emoji of a ")
+      |> String.replace("emoji of a an ", "emoji of an ")
+
     {:ok, deployment} = Replicate.Deployments.get("cbh123/sdxl-emoji")
 
     {:ok, prediction} =
       Replicate.Deployments.create_prediction(deployment,
-        prompt: prompt,
+        prompt: styled_prompt,
         width: 512,
         height: 512,
         num_inference_steps: 30,
