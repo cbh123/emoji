@@ -136,7 +136,7 @@ defmodule EmojiWeb.HomeLive do
 
   def handle_info({:background_removed, prediction, image}, socket) do
     r2_url = save_r2("prediction-#{prediction.id}-nobg", image)
-    send_telegram_message(prediction.prompt, image, prediction.id, prediction.moderation_score)
+    # send_telegram_message(prediction.prompt, image, prediction.id, prediction.moderation_score)
 
     {:ok, prediction} = Predictions.update_prediction(prediction, %{no_bg_output: r2_url})
 
