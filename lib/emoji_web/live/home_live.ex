@@ -174,8 +174,11 @@ defmodule EmojiWeb.HomeLive do
   defp gen_image(prompt) do
     {:ok, deployment} = Replicate.Deployments.get("cbh123/sdxl-emoji")
 
+    {:ok, model} = Replicate.Models.get("fofr/sdxl-emoji")
+    version = Replicate.Models.get_latest_version!(model)
+
     {:ok, prediction} =
-      Replicate.Deployments.create_prediction(deployment,
+      Replicate.Predictions.create(version,
         prompt: prompt,
         width: 512,
         height: 512,
