@@ -6,8 +6,8 @@ config :phoenix_live_view, :debug_heex_annotations, true
 # Configure your database
 config :emoji, Emoji.Repo,
   username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
+  password: System.get_env("DB_PASS", "postgres"),
+  hostname: System.get_env("DB_HOST", "localhost"),
   database: "emoji_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
